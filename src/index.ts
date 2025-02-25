@@ -13,7 +13,6 @@ import authRoutes from "./routes/auth.route";
 import isAuthenticated from "./middlewares/isAuthenticated.middleware";
 import userRoutes from "./routes/user.route";
 import skillsRoutes from "./routes/skills.route";
-import skillFinderRoutes from "./routes/skillFinder.route";
 import careerRoutes from "./routes/career.route";
 
 const app = express();
@@ -56,8 +55,7 @@ app.get(
 app.use(`${BASE_PATH}/auth`, authRoutes);
 app.use(`${BASE_PATH}/user`, isAuthenticated, userRoutes);
 app.use(`${BASE_PATH}/skills`, isAuthenticated, skillsRoutes);
-app.use(`${BASE_PATH}/skill-finder`, isAuthenticated, skillFinderRoutes);
-app.use("/api/career", isAuthenticated, careerRoutes);
+app.use(`${BASE_PATH}/career`, isAuthenticated, careerRoutes);
 
 
 app.use(errorHandler);

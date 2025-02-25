@@ -1,22 +1,16 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 export interface QuestionDocument extends Document {
-    category: "skills" | "career";
-    question: string;
+    questionText: string;
     options: string[];
-    skillMapping?: {
-        [key: string]: string[]; //Answer to skill mapping
-    }
+    skillMapping: {
+        [key: string]: string[]; // e.g., { "option1": ["skill1", "skill2"] }
+    };
 }
 
 const questionSchema = new Schema<QuestionDocument>(
     {
-        category: {
-            type: String,
-            enum: ["skills", "career"],
-            required: true,
-        },
-        question: {
+        questionText: {
             type: String,
             required: true,
         },
@@ -25,8 +19,9 @@ const questionSchema = new Schema<QuestionDocument>(
             required: true,
         },
         skillMapping: {
-            type: Object,
+            type: Map,
             of: [String],
+            default: {},
         },
     },
     {
