@@ -11,7 +11,6 @@ const appConfig = ()  => ({
 
     FRONTEND_URL: getEnv("FRONTEND_URL", "localhost"),
     FRONTEND_ORIGIN: getEnv("FRONTEND_ORIGIN"),
-    FRONTEND_GOOGLE_CALLBACK_URL: getEnv("FRONTEND_GOOGLE_CALLBACK_URL"),
 })
 
 export const config = appConfig();
