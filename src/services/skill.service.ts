@@ -1,5 +1,8 @@
 import questionModel from "../models/question.model";
 import SkillModel from "../models/skill.model";
+import UserModel from "../models/user.model";
+import CareerModel from "../models/career.model";
+import { BadRequestException, NotFoundException } from "../utils/appError";
 
 export const findSkillsService = async (answers: { questionId: string; answer: string }[]) => {
   let suggestedSkills: string[] = [];
@@ -27,4 +30,44 @@ export const findSkillsService = async (answers: { questionId: string; answer: s
   }
 
   return [...new Set(suggestedSkills)];
+};
+
+
+export const getSuggestedSkillsService = async (userId: string) => {
+  const user = await UserModel.findById(userId);
+  if (!user) {
+    throw new NotFoundException("User not found");
+  }
+  return user.selectedSkills;
+};
+
+export const selectSkillService = async (userId: string, pickedSkill: string) => {
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+  
+    if (!user.selectedSkills.includes(pickedSkill)) {
+      throw new NotFoundException("Skill not in suggested skills");
+    }
+  
+    user.pickedSkill = pickedSkill;
+    await user.save();
+    return user.pickedSkill;
+  };
+
+
+
+export const getCareerQuestionsService = async (userId: string) => {
+  const user = await UserModel.findById(userId);
+  if (!user) {
+    throw new NotFoundException("User not found");
+  }
+
+  if (!user.pickedSkill) {
+    throw new BadRequestException("No skill picked");
+  }
+
+  const careerQuestions = await CareerModel.find({ skill: user.pickedSkill });
+  return careerQuestions;
 };

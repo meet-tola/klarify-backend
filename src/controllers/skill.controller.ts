@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import UserModel from "../models/user.model";
 import { HTTPSTATUS } from "../config/http.config";
-import { findSkillsService } from "../services/skill.service";
+import { findSkillsService, getCareerQuestionsService, getSuggestedSkillsService, selectSkillService } from "../services/skill.service";
 import { asyncHandler } from "../middlewares/asyncHandler.middleware";
 import mongoose from "mongoose";
 
@@ -31,3 +31,22 @@ export const saveSkillsAssessment = asyncHandler(async (req: Request, res: Respo
     suggestedSkills: user.selectedSkills,
   });
 });
+
+export const getSuggestedSkills = async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const skills = await getSuggestedSkillsService(userId);
+  res.status(HTTPSTATUS.OK).json(skills);
+};
+
+export const selectSkill = async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const { pickedSkill } = req.body;
+  const selectedSkill = await selectSkillService(userId, pickedSkill);
+  res.status(HTTPSTATUS.OK).json({ selectedSkill });
+};
+
+export const getCareerQuestions = async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const questions = await getCareerQuestionsService(userId);
+  res.status(HTTPSTATUS.OK).json(questions);
+};

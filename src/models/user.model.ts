@@ -14,6 +14,7 @@ export interface UserDocument extends Document {
         answer: string;
     }[];
     selectedSkills: string[];
+    pickedSkill?: string;
     careerAssessment: {
         questionId: mongoose.Types.ObjectId;
         answer: string;
@@ -22,7 +23,7 @@ export interface UserDocument extends Document {
     createdAt: Date;
     updatedAt: Date;
     comparePassword(value: string): Promise<boolean>;
-  omitPassword(): Omit<UserDocument, "password">;
+    omitPassword(): Omit<UserDocument, "password">;
 }
 
 const userSchema = new Schema<UserDocument>(
@@ -68,6 +69,10 @@ const userSchema = new Schema<UserDocument>(
                 type: String,
             },
         ],
+        pickedSkill: {
+            type: String,
+            default: null,
+        },
         careerAssessment: [
             {
                 questionId: {
@@ -91,22 +96,22 @@ const userSchema = new Schema<UserDocument>(
 
 userSchema.pre("save", async function (next) {
     if (this.isModified("password")) {
-      if (this.password) {
-        this.password = await hashValue(this.password);
-      }
+        if (this.password) {
+            this.password = await hashValue(this.password);
+        }
     }
     next();
-  });
-  
-  userSchema.methods.omitPassword = function (): Omit<UserDocument, "password"> {
+});
+
+userSchema.methods.omitPassword = function (): Omit<UserDocument, "password"> {
     const userObject = this.toObject();
     delete userObject.password;
     return userObject;
-  };
-  
-  userSchema.methods.comparePassword = async function (value: string) {
+};
+
+userSchema.methods.comparePassword = async function (value: string) {
     return compareValue(value, this.password);
-  };
-  
-  const UserModel = mongoose.model<UserDocument>("User", userSchema);
-  export default UserModel;
+};
+
+const UserModel = mongoose.model<UserDocument>("User", userSchema);
+export default UserModel;
