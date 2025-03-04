@@ -1,5 +1,5 @@
 import "dotenv/config";
-import QuestionModel from "../models/question.model";
+import QuestionModel from "../models/skillQuestion.model";
 import connectDB from "../config/database.config";
 
 const questions = [

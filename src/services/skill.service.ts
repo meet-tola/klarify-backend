@@ -1,4 +1,4 @@
-import questionModel from "../models/question.model";
+import questionModel from "../models/skillQuestion.model";
 import SkillModel from "../models/skill.model";
 import UserModel from "../models/user.model";
 import { NotFoundException } from "../utils/appError";

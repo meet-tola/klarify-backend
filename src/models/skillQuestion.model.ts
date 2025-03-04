@@ -1,14 +1,14 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-export interface QuestionDocument extends Document {
+export interface skillQuestionDocument extends Document {
     questionText: string;
     options: string[];
     skillMapping: {
-        [key: string]: string[]; // e.g., { "option1": ["skill1", "skill2"] }
+        [key: string]: string[]; 
     };
 }
 
-const questionSchema = new Schema<QuestionDocument>(
+const skillQuestionSchema = new Schema<skillQuestionDocument>(
     {
         questionText: {
             type: String,
@@ -29,4 +29,4 @@ const questionSchema = new Schema<QuestionDocument>(
     }
 );
 
-export default mongoose.model<QuestionDocument>("Question", questionSchema);
+export default mongoose.model<skillQuestionDocument>("SkilQuestion", skillQuestionSchema);
