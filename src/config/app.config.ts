@@ -9,6 +9,8 @@ const appConfig = ()  => ({
     SESSION_SECRET: getEnv("SESSION_SECRET"),
     SESSION_EXPIRES_IN: getEnv("SESSION_EXPIRES_IN", "1d"),
 
+    OPENAI_API_KEY: getEnv("OPENAI_API_KEY"),
+
     FRONTEND_URL: getEnv("FRONTEND_URL", "localhost"),
     FRONTEND_ORIGIN: getEnv("FRONTEND_ORIGIN"),
 })

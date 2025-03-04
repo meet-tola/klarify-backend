@@ -1,8 +1,7 @@
 import questionModel from "../models/question.model";
 import SkillModel from "../models/skill.model";
 import UserModel from "../models/user.model";
-import CareerModel from "../models/career.model";
-import { BadRequestException, NotFoundException } from "../utils/appError";
+import { NotFoundException } from "../utils/appError";
 
 export const findSkillsService = async (answers: { questionId: string; answer: string }[]) => {
   let suggestedSkills: string[] = [];
@@ -58,16 +57,4 @@ export const selectSkillService = async (userId: string, pickedSkill: string) =>
 
 
 
-export const getCareerQuestionsService = async (userId: string) => {
-  const user = await UserModel.findById(userId);
-  if (!user) {
-    throw new NotFoundException("User not found");
-  }
 
-  if (!user.pickedSkill) {
-    throw new BadRequestException("No skill picked");
-  }
-
-  const careerQuestions = await CareerModel.find({ skill: user.pickedSkill });
-  return careerQuestions;
-};

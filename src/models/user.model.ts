@@ -6,7 +6,6 @@ export interface UserDocument extends Document {
     name: string;
     email: string;
     password?: string;
-    // profilePicture: string | null;
     isActive: boolean;
     lastLogin: Date | null;
     skillsAssessment: {
@@ -19,7 +18,29 @@ export interface UserDocument extends Document {
         questionId: mongoose.Types.ObjectId;
         answer: string;
     }[];
-    learningPath: string;
+    learningPath: [
+        {
+            skill?: string;
+            level?: string;
+            steps?: string[];
+            youtubeVideos?: {
+                title: string;
+                url: string;
+                thumbnail: string;
+            }[];
+            articles?: {
+                title: string;
+                url: string;
+                author: string;
+            }[];
+            projects?: {
+                name: string;
+                url: string;
+                stars: number;
+            }[];
+            roadmap?: mongoose.Types.ObjectId; // Reference to the Roadmap model
+        }
+    ];
     createdAt: Date;
     updatedAt: Date;
     comparePassword(value: string): Promise<boolean>;
@@ -41,10 +62,6 @@ const userSchema = new Schema<UserDocument>(
             type: String,
             required: true,
         },
-        // profilePicture: {
-        //     type: String,
-        //     default: null,
-        // },
         isActive: {
             type: Boolean,
             default: false,
@@ -84,10 +101,67 @@ const userSchema = new Schema<UserDocument>(
                 },
             },
         ],
-        learningPath: {
-            type: String,
-            default: "",
-        },
+        learningPath: [
+            {
+                skill: {
+                    type: String,
+                    required: true,
+                },
+                level: {
+                    type: String,
+                    required: true,
+                },
+                steps: [
+                    {
+                        type: String,
+                    },
+                ],
+                youtubeVideos: [
+                    {
+                        title: {
+                            type: String,
+                        },
+                        url: {
+                            type: String,
+                        },
+                        thumbnail: {
+                            type: String,
+                        },
+                    },
+                ],
+                articles: [
+                    {
+                        title: {
+                            type: String,
+                        },
+                        url: {
+                            type: String,
+                        },
+                        author: {
+                            type: String,
+                        },
+                    },
+                ],
+                projects: [
+                    {
+                        name: {
+                            type: String,
+                        },
+                        url: {
+                            type: String,
+                        },
+                        stars: {
+                            type: Number,
+                        },
+                    },
+                ],
+                roadmap: {
+                    type: Schema.Types.ObjectId,
+                    ref: "Roadmap",
+                    default: null,
+                },
+            },
+        ],
     },
     {
         timestamps: true,

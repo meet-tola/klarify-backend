@@ -1,6 +1,9 @@
 import express from "express";
-import { saveCareerAssessment } from "../controllers/career.controller";
+import { getCareerQuestions, evaluateCareerAnswers } from "../controllers/career.controller";
 
 const router = express.Router();
-router.post("/:userId", saveCareerAssessment);
+
+router.get("/:userId/career-questions", getCareerQuestions);
+router.post("/:userId/evaluate-career", evaluateCareerAnswers);
+
 export default router;
