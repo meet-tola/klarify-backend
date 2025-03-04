@@ -3,6 +3,7 @@ import { BadRequestException } from "../utils/appError";
 import UserModel from "../models/user.model";
 import RoadmapModel from "../models/roadmap.model";
 import { config } from "../config/app.config";
+import extractText from "../utils/helper";
 
 const token = config.OPENAI_API_KEY;
 
@@ -14,12 +15,14 @@ export const generateRoadmapContentService = async (userId: string) => {
   const skill = user.pickedSkill;
   const level = user.learningPath[0]?.level || "Beginner";
 
-  const prompt = `Generate a structured learning roadmap for ${skill} at ${level} level. Include:
-  - Key learning steps
-  - Concepts to focus on
-  - Hands-on exercises
-  - Technologies/tools needed
-  - Timeline`;
+  const prompt = `Generate a structured learning roadmap for ${skill} at ${level} level. Use this exact format:
+  - Key learning steps: (List each step on a new line starting with "- ")
+  - Concepts to focus on: (List each concept on a new line starting with "- ")
+  - Hands-on exercises: (List each exercise on a new line starting with "- ")
+  - Technologies/tools needed: (List each tool on a new line starting with "- ")
+  - Timeline: (Provide a structured timeframe)
+  
+  Strictly follow this format.`;
 
   const client = new OpenAI({
     baseURL: "https://models.inference.ai.azure.com",
@@ -38,19 +41,20 @@ export const generateRoadmapContentService = async (userId: string) => {
     top_p: 1
   });
   const content = response.choices[0]?.message?.content;
+  
   if (!content) throw new Error("No content received from OpenAI");
   const roadmapText = content.trim().split("\n");
-
+  
   const roadmap = new RoadmapModel({
     userId: user._id,
     skill,
     level,
-    steps: roadmapText.filter((line) => line.startsWith("- Key learning steps:")).map((line) => line.replace("- Key learning steps:", "").trim()),
-    concepts: roadmapText.filter((line) => line.startsWith("- Concepts to focus on:")).map((line) => line.replace("- Concepts to focus on:", "").trim()),
-    exercises: roadmapText.filter((line) => line.startsWith("- Hands-on exercises:")).map((line) => line.replace("- Hands-on exercises:", "").trim()),
-    technologies: roadmapText.filter((line) => line.startsWith("- Technologies/tools needed:")).map((line) => line.replace("- Technologies/tools needed:", "").trim()),
-    timeline: roadmapText.find((line) => line.startsWith("- Timeline:"))?.replace("- Timeline:", "").trim() || "",
-  });
+    steps: extractText("Key learning steps", roadmapText),
+    concepts: extractText("Concepts to focus on", roadmapText),
+    exercises: extractText("Hands-on exercises", roadmapText),
+    technologies: extractText("Technologies/tools needed", roadmapText),
+    timeline: roadmapText.find((line) => line.toLowerCase().startsWith("- timeline:"))?.replace(/-?\s*timeline:?\s*/i, "").trim() || "",
+  });  
 
   await roadmap.save();
 
