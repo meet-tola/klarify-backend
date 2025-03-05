@@ -7,8 +7,6 @@ export interface RoadmapDocument extends Document {
     level: string;
     steps: string[];
     concepts: string[];
-    exercises: string[];
-    technologies: string[];
     timeline: string;
     createdAt: Date;
     updatedAt: Date;
@@ -35,16 +33,6 @@ const roadmapSchema = new Schema<RoadmapDocument>(
             },
         ],
         concepts: [
-            {
-                type: String,
-            },
-        ],
-        exercises: [
-            {
-                type: String,
-            },
-        ],
-        technologies: [
             {
                 type: String,
             },

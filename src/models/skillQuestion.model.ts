@@ -29,4 +29,4 @@ const skillQuestionSchema = new Schema<skillQuestionDocument>(
     }
 );
 
-export default mongoose.model<skillQuestionDocument>("SkilQuestion", skillQuestionSchema);
+export default mongoose.model<skillQuestionDocument>("SkillQuestion", skillQuestionSchema);

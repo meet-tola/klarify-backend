@@ -35,8 +35,8 @@ export interface UserDocument extends Document {
             }[];
             projects?: {
                 name: string;
-                url: string;
-                stars: number;
+                description: string;
+                features: string[];
             }[];
             roadmap?: mongoose.Types.ObjectId; // Reference to the Roadmap model
         }
@@ -147,11 +147,11 @@ const userSchema = new Schema<UserDocument>(
                         name: {
                             type: String,
                         },
-                        url: {
+                        description: {
                             type: String,
                         },
-                        stars: {
-                            type: Number,
+                        features: {
+                            type: String,
                         },
                     },
                 ],

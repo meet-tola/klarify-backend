@@ -11,6 +11,8 @@ const appConfig = ()  => ({
 
     OPENAI_API_KEY: getEnv("OPENAI_API_KEY"),
 
+    YOUTUBE_API_KEY: getEnv("YOUTUBE_API_KEY"),
+
     FRONTEND_URL: getEnv("FRONTEND_URL", "localhost"),
     FRONTEND_ORIGIN: getEnv("FRONTEND_ORIGIN"),
 })
