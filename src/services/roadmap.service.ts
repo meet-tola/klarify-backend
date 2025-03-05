@@ -3,7 +3,7 @@ import { BadRequestException } from "../utils/appError";
 import UserModel from "../models/user.model";
 import RoadmapModel from "../models/roadmap.model";
 import { config } from "../config/app.config";
-import { fetchYouTubeVideos, fetchArticles } from "../services/learningResources.service";
+import { fetchYouTubeVideos, fetchArticles, fetchProjects } from "../services/learningResources.service";
 
 const token = config.OPENAI_API_KEY;
 
@@ -15,28 +15,75 @@ export const generateRoadmapContentService = async (userId: string) => {
   const skill = user.pickedSkill;
   const level = user.learningPath[0]?.level || "Beginner";
 
-  // Updated AI Prompt
+  // Updated AI Prompt - Structured JSON format
   const prompt = `
-  You are a career advisor AI. Based on the user's selected skill, generate a structured learning roadmap.
+  You are an AI roadmap generator. Your task is to generate a structured learning roadmap in JSON format. The roadmap should contain multiple phases, each divided into weekly learning steps. Each week should include an overview, key concepts, exercises, additional resources, and suggested images.
 
-  ### Skill: ${skill}  
-  ### User's Background: ${level}  
+  ### User Information  
+  - Skill: ${skill}  
+  - User Level: ${level}  
 
-  **Output Format:**  
-  - **Key Learning Steps:**  
-    - (List steps, starting with "- ")  
-  - **Concepts to Focus On:**  
-    - (List concepts, starting with "- ")  
-  - **Hands-on Exercises:**  
-    - (List exercises, starting with "- ")  
-  - **Recommended Learning Keywords:** (Comma-separated keywords)  
-  - **Project Idea:**  
-    - Title: (Project title)  
-    - Description: (Brief description)  
-    - Features: (List 3-5 features)  
-  - **Estimated Learning Timeline:** (Short timeframe)  
-
-  Ensure the project idea is **practical and relevant** to the skill.
+  ### JSON Format Example:
+  {
+    "phases": [
+      {
+        "title": "Phase 1: Foundations",
+        "description": "Introduction to the basics of ${skill}.",
+        "weeks": [
+          {
+            "week": "Week 1",
+            "topic": "Introduction to ${skill}",
+            "overview": "Detailed explanation of the topic...",
+            "concepts": ["Concept 1", "Concept 2"],
+            "exercises": ["Exercise 1", "Exercise 2"],
+            "resources": {
+              "videos": ["YouTube link 1", "YouTube link 2"],
+              "articles": ["Article link 1", "Article link 2"],
+              "books": ["Book recommendation 1"]
+            },
+            "illustration": "Description of an image that supports learning"
+          },
+          {
+            "week": "Week 2",
+            "topic": "Advanced Basics",
+            "overview": "More details about...",
+            "concepts": ["Concept 3", "Concept 4"],
+            "exercises": ["Exercise 3", "Exercise 4"],
+            "resources": {
+              "videos": ["YouTube link 3"],
+              "articles": ["Article link 3"]
+            },
+            "illustration": "Another image description"
+          }
+        ]
+      },
+      {
+        "title": "Phase 2: Intermediate Level",
+        "description": "Building more advanced skills...",
+        "weeks": [
+          {
+            "week": "Week 3",
+            "topic": "Design Principles",
+            "overview": "Understanding color, typography...",
+            "concepts": ["UI Concepts", "UX Theories"],
+            "exercises": ["Create a wireframe"],
+            "resources": {
+              "videos": ["UI video"],
+              "articles": ["Design article"]
+            },
+            "illustration": "Image of a UI wireframe"
+          }
+        ]
+      }
+    ],
+    "finalProject": {
+      "title": "Build a Full Project",
+      "description": "Apply everything learned to create a complete project",
+      "features": ["Feature 1", "Feature 2", "Feature 3"]
+    }
+  }
+  
+  Ensure the response is valid JSON.
   `;
 
   const client = new OpenAI({
@@ -52,36 +99,30 @@ export const generateRoadmapContentService = async (userId: string) => {
   });
 
   const content = response.choices[0]?.message?.content;
-  if (!content) throw new Error("No content received from OpenAI");
+  if (!content) throw new Error("No content received from OpenAI");  
 
-  // Extract sections from AI response
-  const roadmapText = content.trim().split("\n");
-  const extractSection = (title: string) =>
-    roadmapText
-      .slice(roadmapText.findIndex(line => line.includes(title)) + 1)
-      .filter(line => line.startsWith("- "))
-      .map(line => line.replace("- ", "").trim());
+  const jsonMatch = content.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error("Failed to extract JSON");
+  
+  let roadmapData;
+  try {
+    roadmapData = JSON.parse(jsonMatch[0]);
+  } catch (error) {
+    throw new Error("Invalid JSON response from OpenAI");
+  }
 
-  const steps = extractSection("**Key Learning Steps:**");
-  const concepts = extractSection("**Concepts to Focus On:**");
-  const keywords = roadmapText.find(line => line.includes("Recommended Learning Keywords:"))?.split(":")[1]?.trim().split(", ") || [];
-  const projectTitle = roadmapText.find(line => line.includes("Title:"))?.split(":")[1]?.trim() || "";
-  const projectDesc = roadmapText.find(line => line.includes("Description:"))?.split(":")[1]?.trim() || "";
-  const projectFeatures = extractSection("Features:");
-  const timeline = roadmapText.find(line => line.includes("Estimated Learning Timeline:"))?.split(":")[1]?.trim() || "";
-
-  // Fetch Learning Resources
+  // Fetch supplementary resources
+  const keywords = [skill, ...roadmapData.phases.flatMap((p: { weeks: { concepts: any; }[]; }) => p.weeks.flatMap((w: { concepts: any; }) => w.concepts))].slice(0, 5);
   const youtubeVideos = await fetchYouTubeVideos(keywords[0] || skill);
   const articles = await fetchArticles(keywords[0] || skill);
+  const projects = await fetchProjects(keywords[0] || skill);
 
   // Save roadmap to MongoDB
   const roadmap = new RoadmapModel({
     userId: user._id,
     skill,
     level,
-    steps,
-    concepts,
-    timeline,
+    phases: roadmapData.phases,
   });
 
   await roadmap.save();
@@ -90,17 +131,14 @@ export const generateRoadmapContentService = async (userId: string) => {
   user.learningPath.push({
     skill,
     level,
-    steps,
+    roadmap: roadmap._id,
     youtubeVideos,
     articles,
-    projects: [
-      {
-        name: projectTitle,
-        description: projectDesc,
-        features: projectFeatures,
-      },
-    ],
-    roadmap: roadmap._id,
+    projects: projects.map((project: { title: any; description: any; features: any; }) => ({
+      name: project.title,
+      description: project.description,
+      features: project.features
+    }))
   });
 
   await user.save();

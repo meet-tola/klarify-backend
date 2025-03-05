@@ -150,11 +150,14 @@ const userSchema = new Schema<UserDocument>(
                         description: {
                             type: String,
                         },
-                        features: {
-                            type: String,
-                        },
+                        features: [
+                            {
+                                type: String,
+                            },
+                        ],
                     },
                 ],
+
                 roadmap: {
                     type: Schema.Types.ObjectId,
                     ref: "Roadmap",
