@@ -8,6 +8,7 @@ export interface UserDocument extends Document {
     password?: string;
     isActive: boolean;
     lastLogin: Date | null;
+    verificationCode?: string;
     skillsAssessment: {
         questionId: mongoose.Types.ObjectId;
         answer: string;
@@ -69,6 +70,10 @@ const userSchema = new Schema<UserDocument>(
         lastLogin: {
             type: Date,
             default: null,
+        },
+        verificationCode: {
+            type: String,
+            required: false
         },
         skillsAssessment: [
             {
