@@ -13,6 +13,9 @@ const appConfig = ()  => ({
 
     YOUTUBE_API_KEY: getEnv("YOUTUBE_API_KEY"),
 
+    SMTP_PASS:getEnv("SMTP_PASS"),
+    SMTP_USER: getEnv("SMTP_USER"),
+
     FRONTEND_URL: getEnv("FRONTEND_URL", "localhost"),
     FRONTEND_ORIGIN: getEnv("FRONTEND_ORIGIN"),
 })

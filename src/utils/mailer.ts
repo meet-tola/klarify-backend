@@ -1,11 +1,12 @@
 import nodemailer from "nodemailer";
+import { config } from "../config/app.config";
 
 export const sendVerificationEmail = async (email: string, code: string) => {
   const transporter = nodemailer.createTransport({
     service: "Gmail",
     auth: {
-      user: process.env.SMTP_USER!,
-      pass: process.env.SMTP_PASS!,
+      user: config.SMTP_USER!,
+      pass: config.SMTP_PASS!,
     },
   });
 

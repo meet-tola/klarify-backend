@@ -3,12 +3,14 @@ import {
   login,
   logOut,
   register,
+  verifyEmail
 } from "../controllers/auth.controller";
 
 
 const authRoutes = Router();
 
 authRoutes.post("/register", register);
+authRoutes.post("/verify-email", verifyEmail);
 authRoutes.post("/login", login);
 
 authRoutes.post("/logout", logOut);
