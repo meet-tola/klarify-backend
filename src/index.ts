@@ -4,7 +4,7 @@ import { config } from "./config/app.config";
 import cors from "cors";
 import session from "cookie-session";
 import connectDatabase from "./config/database.config";
-import { errorHandler } from "./middlewares/error.middleware";
+import { errorHandler } from "./middlewares/errorHandler.middleware";
 import { asyncHandler } from "./middlewares/asyncHandler.middleware";
 import { HTTPSTATUS } from "./config/http.config";
 import { ErrorCodeEnum } from "./enums/error-code.enum";

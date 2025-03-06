@@ -17,7 +17,7 @@ export const fetchYouTubeVideos = async (query: string) => {
         },
     });
 
-    return response.data.items.map((item: any) => ({
+    return (response.data as { items: any[] }).items.map((item: any) => ({
         title: item.snippet.title,
         url: `https://www.youtube.com/watch?v=${item.id.videoId}`,
         thumbnail: item.snippet.thumbnails.medium.url,
