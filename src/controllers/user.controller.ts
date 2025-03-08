@@ -6,10 +6,10 @@ import { getCurrentUserService } from "../services/user.service";
 
 export const getCurrentUser = asyncHandler(
   async (req: Request, res: Response) => {
-    const userId = req.user?._id?.toString();
+    const userId = req.session?.userId;
 
     if (!userId) {
-      return res.status(HTTPSTATUS.BAD_REQUEST).json({
+      return res.status(HTTPSTATUS.UNAUTHORIZED).json({
         message: "User ID is missing",
       });
     }

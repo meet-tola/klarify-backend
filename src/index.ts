@@ -34,7 +34,7 @@ app.use(
 
 app.use(
   cors({
-    origin: config.FRONTEND_ORIGIN,
+    origin: config.FRONTEND_ORIGIN || "http://localhost:3000",
     credentials: true,
   })
 );
@@ -54,7 +54,7 @@ app.get(
 );
 
 app.use(`${BASE_PATH}/auth`, authRoutes);
-app.use(`${BASE_PATH}/user`, isAuthenticated, userRoutes);
+app.use(`${BASE_PATH}/user`, userRoutes);
 app.use(`${BASE_PATH}/skills`, isAuthenticated, skillsRoutes);
 app.use(`${BASE_PATH}/career`, isAuthenticated, careerRoutes);
 app.use(`${BASE_PATH}/roadmap`, isAuthenticated, roadmapRoutes);
