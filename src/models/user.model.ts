@@ -6,7 +6,6 @@ export interface UserDocument extends Document {
     name: string;
     email: string;
     password?: string;
-    isActive: boolean;
     lastLogin: Date | null;
     verificationCode?: string;
     skillsAssessment: {
@@ -62,10 +61,6 @@ const userSchema = new Schema<UserDocument>(
         password: {
             type: String,
             required: true,
-        },
-        isActive: {
-            type: Boolean,
-            default: false,
         },
         lastLogin: {
             type: Date,
