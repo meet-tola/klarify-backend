@@ -34,7 +34,7 @@ app.use(
 
 app.use(
   cors({
-    origin: config.FRONTEND_ORIGIN || "http://localhost:3000",
+    origin: config.FRONTEND_ORIGIN,
     credentials: true,
   })
 );
