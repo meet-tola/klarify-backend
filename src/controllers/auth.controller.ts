@@ -25,7 +25,6 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 export const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
   const { code } = req.body;
   const userId = req.session.userId;
-  console.log("Session userId:", userId); // Debugging
   if (!userId) throw new UnauthorizedException("Session expired. Please log in again.");
 
   const { user } = await confirmVerificationCodeService(userId, code);
@@ -34,7 +33,6 @@ export const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
 
 export const resendVerificationCode = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.session.userId;
-  console.log("Session userId:", userId); // Debugging
   if (!userId) throw new UnauthorizedException("Session expired. Please log in again.");
 
   const response = await resendVerificationCodeService(userId);
