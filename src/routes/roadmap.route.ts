@@ -5,6 +5,6 @@ const router = express.Router();
 
 router.post("/:userId/content", getRoadmapContent);
 
-router.get("/:userId", getRoadmaps);
+router.get("/:userId/roadmap", getRoadmaps);
 
 export default router;
