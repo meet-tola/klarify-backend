@@ -9,7 +9,7 @@ export const setToken = (res: Response, userId: string): string => {
   res.cookie("token", token, {
     httpOnly: true, 
     secure: config.NODE_ENV === "production", 
-    sameSite: config.NODE_ENV === "production" ? "none" : "lax", 
+    sameSite: "strict",
     maxAge: 60 * 60 * 1000, 
   });
 
