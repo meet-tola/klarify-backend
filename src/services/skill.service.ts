@@ -72,7 +72,7 @@ export const selectSkillService = async (userId: string, pickedSkill: string) =>
   }
 
   // Check if the picked skill is in the user's selected skills
-  if (!user.selectedSkills.includes(pickedSkill)) {
+  if (!user.selectedSkills || !user.selectedSkills.includes(pickedSkill)) {
     throw new NotFoundException("Skill not in suggested skills");
   }
 

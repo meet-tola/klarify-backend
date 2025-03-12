@@ -11,13 +11,13 @@ export interface UserDocument extends Document {
     skillsAssessment: {
         questionId: mongoose.Types.ObjectId;
         answer: string;
-    }[];
-    selectedSkills: string[];
+    }[] | null;
+    selectedSkills: string[] | null;
     pickedSkill?: string;
     careerAssessment: {
         questionId: mongoose.Types.ObjectId;
         answer: string;
-    }[];
+    }[] | null;
     learningPath: [
         {
             skill?: string;
@@ -70,37 +70,32 @@ const userSchema = new Schema<UserDocument>(
             type: String,
             required: false
         },
-        skillsAssessment: [
-            {
-                questionId: {
-                    type: Schema.Types.ObjectId,
-                    ref: "Question",
+        skillsAssessment: {
+            type: [
+                {
+                    questionId: { type: Schema.Types.ObjectId, ref: "Question" },
+                    answer: { type: String },
                 },
-                answer: {
-                    type: String,
-                },
-            },
-        ],
-        selectedSkills: [
-            {
-                type: String,
-            },
-        ],
+            ],
+            default: null,
+        },
+        selectedSkills: {
+            type: [String],
+            default: [],
+        },
         pickedSkill: {
             type: String,
             default: null,
         },
-        careerAssessment: [
-            {
-                questionId: {
-                    type: Schema.Types.ObjectId,
-                    ref: "Question",
+        careerAssessment: {
+            type: [
+                {
+                    questionId: { type: Schema.Types.ObjectId, ref: "Question", },
+                    answer: { type: String, },
                 },
-                answer: {
-                    type: String,
-                },
-            },
-        ],
+            ],
+            default: null,
+        },
         learningPath: [
             {
                 skill: {

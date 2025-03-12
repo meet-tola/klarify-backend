@@ -6,6 +6,7 @@ import { findSkillsService, getSuggestedSkillsService, selectSkillService } from
 import { asyncHandler } from "../middlewares/asyncHandler.middleware";
 import mongoose from "mongoose";
 import { NotFoundException } from "../utils/appError";
+import SkillModel from "../models/skill.model";
 
 export const getSkillQuestions = asyncHandler(async (req: Request, res: Response) => {
   const { userId } = req.params;
@@ -61,6 +62,8 @@ export const saveSkillsAssessment = asyncHandler(async (req: Request, res: Respo
   });
 });
 
+
+
 export const getSuggestedSkills = asyncHandler(async (req: Request, res: Response) => {
   const { userId } = req.params;
 
@@ -75,6 +78,8 @@ export const getSuggestedSkills = asyncHandler(async (req: Request, res: Respons
   res.status(HTTPSTATUS.OK).json(suggestedSkills);
 });
 
+
+
 export const selectSkill = asyncHandler(async (req: Request, res: Response) => {
   const { userId } = req.params;
   const { pickedSkill } = req.body;
@@ -88,4 +93,52 @@ export const selectSkill = asyncHandler(async (req: Request, res: Response) => {
   // Select the skill and update user
   const selectedSkill = await selectSkillService(userId, pickedSkill);
   res.status(HTTPSTATUS.OK).json({ selectedSkill });
+});
+
+
+
+export const searchSkills = asyncHandler(async (req: Request, res: Response) => {
+  const { query } = req.query;
+
+  // If no query is provided, return all skills
+  const filter = query
+    ? {
+        $or: [
+          { category: { $regex: query as string, $options: "i" } },
+          { description: { $regex: query as string, $options: "i" } },
+        ],
+      }
+    : {};
+
+  const skills = await SkillModel.find(filter, { category: 1, description: 1, _id: 0 });
+
+  res.status(HTTPSTATUS.OK).json(skills);
+});
+
+
+
+export const selectSkillFromSearch = asyncHandler(async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const { pickedSkill } = req.body;
+
+  // Check if user exists
+  const user = await UserModel.findById(userId);
+  if (!user) {
+    throw new NotFoundException("User not found");
+  }
+
+  // Update the user's picked skill
+  user.pickedSkill = pickedSkill;
+
+  // Set skillsAssessment and careerAssessment to null to bypass onboarding
+  user.skillsAssessment = null;
+  user.careerAssessment = null;
+  user.selectedSkills = null;
+
+  await user.save();
+
+  res.status(HTTPSTATUS.OK).json({
+    message: "Skill selected successfully",
+    pickedSkill: user.pickedSkill,
+  });
 });
