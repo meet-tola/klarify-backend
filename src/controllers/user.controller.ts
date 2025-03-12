@@ -6,7 +6,9 @@ import { getCurrentUserService } from "../services/user.service";
 
 export const getCurrentUser = asyncHandler(
   async (req: Request, res: Response) => {
-    const userId = req.session?.userId;
+    const userId = req.user?.userId;
+    console.log("userId", userId);
+    
 
     if (!userId) {
       return res.status(HTTPSTATUS.UNAUTHORIZED).json({

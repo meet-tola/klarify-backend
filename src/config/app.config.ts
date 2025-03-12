@@ -9,6 +9,8 @@ const appConfig = ()  => ({
     SESSION_SECRET: getEnv("SESSION_SECRET"),
     SESSION_EXPIRES_IN: getEnv("SESSION_EXPIRES_IN", "1d"),
 
+    JWT_SECRET: getEnv("JWT_SECRET"),
+
     OPENAI_API_KEY: getEnv("OPENAI_API_KEY"),
 
     YOUTUBE_API_KEY: getEnv("YOUTUBE_API_KEY"),
