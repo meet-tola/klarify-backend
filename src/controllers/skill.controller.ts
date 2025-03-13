@@ -96,7 +96,6 @@ export const selectSkill = asyncHandler(async (req: Request, res: Response) => {
 });
 
 
-
 export const searchSkills = asyncHandler(async (req: Request, res: Response) => {
   const { query } = req.query;
 
@@ -140,5 +139,41 @@ export const selectSkillFromSearch = asyncHandler(async (req: Request, res: Resp
   res.status(HTTPSTATUS.OK).json({
     message: "Skill selected successfully",
     pickedSkill: user.pickedSkill,
+  });
+});
+
+
+export const selectedSearchSkill = asyncHandler(async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const { pickedSkill } = req.body;
+
+  // Check if user exists
+  const user = await UserModel.findById(userId);
+  if (!user) {
+    throw new NotFoundException("User not found");
+  }
+
+  // Fetch the skill details
+  const skill = await SkillModel.findOne({ category: pickedSkill });
+  if (!skill) {
+    throw new NotFoundException("Skill details not found");
+  }
+
+  // Prepare the response data
+  const selectedSearchSkill = {
+    category: skill.category,
+    description: skill.description,
+    keySkills: skill.keySkills,
+    jobRoles: skill.jobRoles,
+  };
+
+  // Update the user's pickedSkill (optional, if needed)
+  user.pickedSkill = pickedSkill;
+  await user.save();
+
+  // Send the response
+  res.status(HTTPSTATUS.OK).json({
+    message: "Skill selected successfully",
+    data: selectedSearchSkill,
   });
 });

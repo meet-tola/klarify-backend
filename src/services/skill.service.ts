@@ -92,7 +92,3 @@ export const selectSkillService = async (userId: string, pickedSkill: string) =>
     jobRoles: skill.jobRoles,
   };
 };
-
-
-
-
