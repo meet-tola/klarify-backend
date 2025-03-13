@@ -6,10 +6,8 @@ const appConfig = ()  => ({
     BASE_PATH: getEnv("BASE_PATH", "/api"),
     MONGO_URI: getEnv("MONGO_URI", ""),
 
-    SESSION_SECRET: getEnv("SESSION_SECRET"),
-    SESSION_EXPIRES_IN: getEnv("SESSION_EXPIRES_IN", "1d"),
-
     JWT_SECRET: getEnv("JWT_SECRET"),
+    JWT_REFRESH_SECRET: getEnv("JWT_REFRESH_SECRET"),
 
     OPENAI_API_KEY: getEnv("OPENAI_API_KEY"),
 

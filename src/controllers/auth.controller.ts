@@ -11,6 +11,8 @@ import {
 } from "../services/auth.service";
 import { UnauthorizedException } from "../utils/appError";
 import { setToken, clearToken } from "../utils/token";
+import { config } from "../config/app.config";
+import jwt from "jsonwebtoken";
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const body = registerSchema.parse(req.body);
@@ -67,4 +69,21 @@ export const resetPassword = asyncHandler(async (req: Request, res: Response) =>
 
   const response = await resetPasswordService(userId, newPassword);
   res.status(HTTPSTATUS.OK).json(response);
+});
+
+
+
+//REFRESH TOKEN
+export const refreshToken = asyncHandler(async (req: Request, res: Response) => {
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) throw new UnauthorizedException("Refresh token missing");
+
+  try {
+    const decoded = jwt.verify(refreshToken, config.JWT_REFRESH_SECRET) as { userId: string };
+    const newAccessToken = jwt.sign({ userId: decoded.userId }, config.JWT_SECRET, { expiresIn: "15m" });
+
+    res.status(200).json({ accessToken: newAccessToken });
+  } catch (error) {
+    throw new UnauthorizedException("Invalid or expired refresh token.");
+  }
 });

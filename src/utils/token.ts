@@ -4,16 +4,17 @@ import { config } from "../config/app.config";
 
 
 export const setToken = (res: Response, userId: string): string => {
-  const token = jwt.sign({ userId }, config.JWT_SECRET, { expiresIn: "24h" });
+  const accessToken = jwt.sign({ userId }, config.JWT_SECRET, { expiresIn: "15m" }); // Shorter expiry
+  const refreshToken = jwt.sign({ userId }, config.JWT_REFRESH_SECRET, { expiresIn: "7d" });
 
-  res.cookie("token", token, {
+  res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     secure: config.NODE_ENV === "production",
-    sameSite: config.NODE_ENV === "production" ? "none" : "lax",
-    maxAge: 24 * 60 * 60 * 1000, 
+    sameSite: "none",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
 
-  return token;
+  return accessToken;
 };
 
 

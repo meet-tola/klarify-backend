@@ -6,10 +6,14 @@ import { asyncHandler } from "./asyncHandler.middleware";
 
 export const isAuthenticated = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const token = req.cookies?.token; 
-    if (!token) throw new UnauthorizedException("Please authenticate.");
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      throw new UnauthorizedException("Please authenticate.");
+    }
 
+    const token = authHeader.split(" ")[1];
     const decoded = jwt.verify(token, config.JWT_SECRET) as { userId: string };
+
     req.user = { userId: decoded.userId };
     next();
   } catch (error) {
