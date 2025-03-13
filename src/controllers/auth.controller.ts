@@ -20,8 +20,8 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   res.cookie('token', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000, 
+    sameSite: "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
   res.status(HTTPSTATUS.CREATED).json({
@@ -57,8 +57,8 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   res.cookie('token', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000, 
+    sameSite: "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
   return res.status(HTTPSTATUS.OK).json({
@@ -73,8 +73,8 @@ export const logOut = asyncHandler(async (req: Request, res: Response) => {
     res.cookie('token', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, 
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     return res.status(HTTPSTATUS.OK).json({ message: "Logged out successfully" });
   } catch (error) {

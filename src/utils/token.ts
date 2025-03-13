@@ -1,4 +1,3 @@
-import { Response } from "express";
 import jwt from "jsonwebtoken";
 import { config } from "../config/app.config";
 
