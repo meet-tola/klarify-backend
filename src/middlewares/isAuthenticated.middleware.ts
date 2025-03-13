@@ -1,22 +1,21 @@
-import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
+import { NextFunction, Request, Response } from "express";
 import { UnauthorizedException } from "../utils/appError";
-import { config } from "../config/app.config";
-import { asyncHandler } from "./asyncHandler.middleware";
+import { verify } from "jsonwebtoken";
 
-export const isAuthenticated = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      throw new UnauthorizedException("Please authenticate.");
-    }
+const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
+  const token = req.cookies.token;
 
-    const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, config.JWT_SECRET) as { userId: string };
-
-    req.user = { userId: decoded.userId };
-    next();
-  } catch (error) {
-    throw new UnauthorizedException("Invalid or expired token.");
+  if (!token) {
+    throw new UnauthorizedException("Unauthorized. Please log in.");
   }
-});
+
+  verify(token, process.env.JWT_SECRET!, (err: any, user: any) => {
+    if (err) {
+      throw new UnauthorizedException("Unauthorized. Please log in.");
+    }
+    req.user = user;
+    next();
+  });
+};
+
+export default isAuthenticated;

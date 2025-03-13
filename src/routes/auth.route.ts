@@ -7,7 +7,7 @@ import {
   logOut, 
   resetPassword,
 } from "../controllers/auth.controller";
-import { isAuthenticated } from "../middlewares/isAuthenticated.middleware";
+import isAuthenticated from "../middlewares/isAuthenticated.middleware";
 
 const router = express.Router();
 

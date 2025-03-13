@@ -6,7 +6,7 @@ import cookieParser from "cookie-parser";
 import connectDatabase from "./config/database.config";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
 import authRoutes from "./routes/auth.route";
-import { isAuthenticated } from "./middlewares/isAuthenticated.middleware";
+import isAuthenticated from "./middlewares/isAuthenticated.middleware";
 import userRoutes from "./routes/user.route";
 import skillsRoutes from "./routes/skills.route";
 import careerRoutes from "./routes/career.route";
@@ -17,6 +17,8 @@ const BASE_PATH = config.BASE_PATH;
 
 // Middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.use(cookieParser());
 app.use(cors({ origin: config.FRONTEND_ORIGIN, credentials: true }));
 
