@@ -22,7 +22,6 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
     httpOnly: true,
     secure: true, 
     sameSite: "none",
-    domain: config.FRONTEND_ORIGIN,
   });
 
   res.status(HTTPSTATUS.CREATED).json({
@@ -59,7 +58,6 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "none",
-    domain: config.FRONTEND_ORIGIN,
   });
 
   return res.status(HTTPSTATUS.OK).json({
