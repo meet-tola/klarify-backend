@@ -11,6 +11,7 @@ import {
 } from "../services/auth.service";
 import { UnauthorizedException } from "../utils/appError";
 import { setToken } from "../utils/token";
+import { config } from "../config/app.config";
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const body = registerSchema.parse(req.body);
@@ -19,9 +20,9 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   const token = setToken(user._id.toString());
   res.cookie('token', token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production", 
+    secure: true, 
     sameSite: "none",
-    path: "/", 
+    domain: config.FRONTEND_ORIGIN,
   });
 
   res.status(HTTPSTATUS.CREATED).json({
@@ -58,7 +59,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "none",
-    path: "/", 
+    domain: config.FRONTEND_ORIGIN,
   });
 
   return res.status(HTTPSTATUS.OK).json({
@@ -72,7 +73,7 @@ export const logOut = asyncHandler(async (req: Request, res: Response) => {
   try {
     res.clearCookie('token', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "none",
     });
     return res.status(HTTPSTATUS.OK).json({ message: "Logged out successfully" });
