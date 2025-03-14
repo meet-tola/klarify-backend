@@ -177,3 +177,20 @@ export const selectedSearchSkill = asyncHandler(async (req: Request, res: Respon
     data: selectedSearchSkill,
   });
 });
+
+
+export const clearUserSkills = asyncHandler(async (req: Request, res: Response) => {
+  const { userId } = req.params;
+
+  // Update the user fields to null or empty array
+  await UserModel.findByIdAndUpdate(userId, {
+    pickedSkill: null,
+    selectedSkills: [],
+    careerAssessment: null,
+    skillsAssessment: null,
+  });
+
+  res.status(HTTPSTATUS.OK).json({
+    message: "User skills and assessments cleared successfully",
+  });
+});

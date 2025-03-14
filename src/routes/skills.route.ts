@@ -1,5 +1,6 @@
 import express from "express";
 import {
+    clearUserSkills,
     getSkillQuestions,
     getSuggestedSkills,
     saveSkillsAssessment,
@@ -17,5 +18,6 @@ router.post("/:userId/select-skill", selectSkill);
 router.get("/search-skills", searchSkills);
 router.post("/:userId/select-skill-from-search", selectSkillFromSearch);
 router.post("/:userId/selected-search-skill", selectedSearchSkill);
+router.put("/:userId/clear-skills", clearUserSkills);
 
 export default router;
