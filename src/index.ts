@@ -18,8 +18,8 @@ const BASE_PATH = config.BASE_PATH;
 // Middleware
 app.use(express.json());
 
-app.use(cookieParser());
-app.use(cors({ origin: process.env.FRONTEND_ORIGIN, credentials: true }));
+// app.use(cookieParser());
+app.use(cors({ origin: config.FRONTEND_ORIGIN, credentials: true }));
 
 // Routes
 app.use(`${BASE_PATH}/auth`, authRoutes);

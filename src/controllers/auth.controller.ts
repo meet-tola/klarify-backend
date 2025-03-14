@@ -11,23 +11,18 @@ import {
 } from "../services/auth.service";
 import { UnauthorizedException } from "../utils/appError";
 import { setToken } from "../utils/token";
-import { config } from "../config/app.config";
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const body = registerSchema.parse(req.body);
   const { user } = await registerUserService(body);
 
+  // Generate JWT token
   const token = setToken(user._id.toString());
-  res.cookie('token', token, {
-    httpOnly: true,
-    secure: true, 
-    sameSite: "none",
-  });
 
   res.status(HTTPSTATUS.CREATED).json({
     message: "Registration successful. Check your email for the verification code.",
     user,
-    token
+    token, // Send token in response
   });
 });
 
@@ -53,34 +48,17 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const { user } = await verifyUserService(email, password);
 
-  const token = setToken(user._id.toString());
-  res.cookie('token', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "none",
-  });
+  const token = setToken(user._id.toString()); // Generate JWT token
 
-  return res.status(HTTPSTATUS.OK).json({
+  res.status(HTTPSTATUS.OK).json({
     message: "Logged in successfully",
-    token,
+    token, 
     user,
   });
 });
 
 export const logOut = asyncHandler(async (req: Request, res: Response) => {
-  try {
-    res.clearCookie('token', {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-    });
-    return res.status(HTTPSTATUS.OK).json({ message: "Logged out successfully" });
-  } catch (error) {
-    console.error("Logout error:", error);
-    return res
-      .status(HTTPSTATUS.INTERNAL_SERVER_ERROR)
-      .json({ error: "Failed to log out" });
-  }
+  return res.status(HTTPSTATUS.OK).json({ message: "Logged out successfully" });
 });
 
 export const resetPassword = asyncHandler(async (req: Request, res: Response) => {
