@@ -17,93 +17,77 @@ export const generateRoadmapContentService = async (userId: string) => {
 
   // Updated AI Prompt - Structured JSON format
   const prompt = `
-  You are an AI roadmap generator. Your task is to generate a structured learning roadmap in JSON format. The roadmap should contain multiple phases, each divided into weekly learning steps. Each week should include an overview, key concepts, exercises, additional resources, and suggested images.
+  You are an AI skill tutor generator. Your task is to generate a structured learning content in JSON format. 
+  You are to generate a course on "${skill}" for a "${level}" user. The course should be divided into phases, and each phase should have lessons. Each lesson should include:
 
-  ### User Information  
-  - Skill: ${skill}  
-  - User Level: ${level}  
+1. A lesson summary with a heading and description.
+2. Sections with different types of content, such as headings, descriptions, code examples, bold text, bullet points, and images.
+3. Resources for the lesson, including exercises, videos, articles, and books.
 
-  ### JSON Format Example:
-  {
-    "phases": [
-      {
-        "title": "Phase 1: Foundations",
-        "description": "Introduction to the basics of ${skill}.",
-        "weeks": [
-          {
-            "week": "Week 1",
-            "topic": "Introduction to ${skill}",
-            "overview": "Detailed explanation of the topic...",
-            "concepts": ["Concept 1", "Concept 2"],
-            "exercises": ["Exercise 1", "Exercise 2"],
-            "resources": {
-              "videos": ["YouTube link 1", "YouTube link 2"],
-              "articles": ["Article link 1", "Article link 2"],
-              "books": ["Book recommendation 1"]
-            },
-            "illustration": "Description of an image that supports learning"
+For each phase, generate a list of keywords that will be used to fetch external resources like YouTube videos, articles, and projects.
+
+Return the response as a JSON object with the following structure:
+{
+  "courseTitle": "string",
+  "userLevel": "string",
+  "keywords": ["string"],
+  "phases": [
+    {
+      "phaseTitle": "string",
+      "phaseKeywords": ["string"],
+      "lessons": [
+        {
+          "lessonTitle": "string",
+          "lessonSummary": {
+            "heading": "string",
+            "description": "string"
           },
-          {
-            "week": "Week 2",
-            "topic": "Advanced Basics",
-            "overview": "More details about...",
-            "concepts": ["Concept 3", "Concept 4"],
-            "exercises": ["Exercise 3", "Exercise 4"],
-            "resources": {
-              "videos": ["YouTube link 3"],
-              "articles": ["Article link 3"]
-            },
-            "illustration": "Another image description"
+          "sections": [
+            {
+              "type": "string",
+              "content": "string",
+              "metadata": {
+                "bold": "boolean",
+                "bullets": ["string"],
+                "imageLink": "string",
+                "alignment": "string",
+                "language": "string"
+              }
+            }
+          ],
+          "resources": {
+            "exercises": ["string"],
+            "videos": ["string"],
+            "articles": ["string"],
+            "books": ["string"]
           }
-        ]
-      },
-      {
-        "title": "Phase 2: Intermediate Level",
-        "description": "Building more advanced skills...",
-        "weeks": [
-          {
-            "week": "Week 3",
-            "topic": "Design Principles",
-            "overview": "Understanding color, typography...",
-            "concepts": ["UI Concepts", "UX Theories"],
-            "exercises": ["Create a wireframe"],
-            "resources": {
-              "videos": ["UI video"],
-              "articles": ["Design article"]
-            },
-            "illustration": "Image of a UI wireframe"
-          }
-        ]
-      }
-    ],
-    "finalProject": {
-      "title": "Build a Full Project",
-      "description": "Apply everything learned to create a complete project",
-      "features": ["Feature 1", "Feature 2", "Feature 3"]
+        }
+      ]
     }
-  }
+  ]
+}
   
   Ensure the response is valid JSON.
   `;
 
   const client = new OpenAI({
     baseURL: "https://models.inference.ai.azure.com",
-    apiKey: token
+    apiKey: token,
   });
 
   const response = await client.chat.completions.create({
     messages: [{ role: "user", content: prompt }],
     model: "gpt-4o",
     temperature: 0.7,
-    max_tokens: 4096
+    max_tokens: 4096,
   });
 
   const content = response.choices[0]?.message?.content;
-  if (!content) throw new Error("No content received from OpenAI");  
+  if (!content) throw new Error("No content received from OpenAI");
 
   const jsonMatch = content.match(/\{[\s\S]*\}/);
   if (!jsonMatch) throw new Error("Failed to extract JSON");
-  
+
   let roadmapData;
   try {
     roadmapData = JSON.parse(jsonMatch[0]);
@@ -111,8 +95,8 @@ export const generateRoadmapContentService = async (userId: string) => {
     throw new Error("Invalid JSON response from OpenAI");
   }
 
-  // Fetch supplementary resources
-  const keywords = [skill, ...roadmapData.phases.flatMap((p: { weeks: { concepts: any; }[]; }) => p.weeks.flatMap((w: { concepts: any; }) => w.concepts))].slice(0, 5);
+  // Fetch supplementary resources using phase keywords
+  const keywords = [skill, ...roadmapData.phases.flatMap((phase: { phaseKeywords: string[] }) => phase.phaseKeywords)].slice(0, 5);
   const youtubeVideos = await fetchYouTubeVideos(keywords[0] || skill);
   const articles = await fetchArticles(keywords[0] || skill);
   const projects = await fetchProjects(keywords[0] || skill);
@@ -134,11 +118,11 @@ export const generateRoadmapContentService = async (userId: string) => {
     roadmap: roadmap._id,
     youtubeVideos,
     articles,
-    projects: projects.map((project: { title: any; description: any; features: any; }) => ({
+    projects: projects.map((project: { title: string; description: string; features: string[] }) => ({
       name: project.title,
       description: project.description,
-      features: project.features
-    }))
+      features: project.features,
+    })),
   });
 
   await user.save();
