@@ -1,10 +1,14 @@
 import express from "express";
-import { getRoadmapContent, getRoadmaps } from "../controllers/roadmap.controller";
+import {
+    generateRoadmapContent,
+    getRoadmaps,
+    getLearningPathAndRoadmapBySkill
+} from "../controllers/roadmap.controller";
 
 const router = express.Router();
 
-router.post("/:userId/content", getRoadmapContent);
-
+router.post("/:userId/content", generateRoadmapContent);
 router.get("/:userId/roadmap", getRoadmaps);
+router.post("/:userId/learning-path", getLearningPathAndRoadmapBySkill);
 
 export default router;

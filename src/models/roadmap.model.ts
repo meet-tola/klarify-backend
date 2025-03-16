@@ -1,25 +1,25 @@
 import mongoose, { Document, Schema } from "mongoose";
 interface Section {
-  type: string; 
-  content: string; 
+  type: string;
+  content: string;
   metadata?: {
-    bold?: boolean; 
-    bullets?: string[]; 
+    bold?: boolean;
+    bullets?: string[];
     imageLink?: string;
-    alignment?: string; 
-    language?: string; 
+    alignment?: string;
+    language?: string;
   };
 }
 interface Lesson {
   lessonTitle: string;
   lessonSummary: {
-    heading: string; 
-    description: string; 
+    heading: string;
+    description: string;
   };
   sections: Section[];
   resources: {
-    exercises: string[]; 
-    videos: string[]; 
+    exercises: string[];
+    videos: string[];
     articles: string[];
     books: string[];
   };
@@ -40,59 +40,59 @@ export interface RoadmapDocument extends Document {
 }
 
 const SectionSchema = new Schema({
-    type: { type: String, required: true },
-    content: { type: String, required: true },
-    metadata: {
-      bold: { type: Boolean, default: false },
-      bullets: { type: [String], default: [] },
-      imageLink: { type: String },
-      alignment: { type: String },
-      language: { type: String },
+  type: { type: String, required: true },
+  content: { type: String, default: "" },
+  metadata: {
+    bold: { type: Boolean, default: false },
+    bullets: { type: [String], default: [] },
+    imageLink: { type: String },
+    alignment: { type: String },
+    language: { type: String },
+  },
+});
+
+const LessonSchema = new Schema({
+  lessonTitle: { type: String, required: true },
+  lessonSummary: {
+    heading: { type: String, required: true },
+    description: { type: String, required: true },
+  },
+  sections: { type: [SectionSchema], required: true },
+  resources: {
+    exercises: { type: [String], default: [] },
+    videos: { type: [String], default: [] },
+    articles: { type: [String], default: [] },
+    books: { type: [String], default: [] },
+  },
+});
+
+const PhaseSchema = new Schema({
+  phaseTitle: { type: String, required: true },
+  phaseKeywords: { type: [String], required: true },
+  lessons: { type: [LessonSchema], required: true },
+});
+
+const roadmapSchema = new Schema<RoadmapDocument>(
+  {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
-  });
-  
-  const LessonSchema = new Schema({
-    lessonTitle: { type: String, required: true },
-    lessonSummary: {
-      heading: { type: String, required: true },
-      description: { type: String, required: true },
+    skill: {
+      type: String,
+      required: true,
     },
-    sections: { type: [SectionSchema], required: true },
-    resources: {
-      exercises: { type: [String], default: [] },
-      videos: { type: [String], default: [] },
-      articles: { type: [String], default: [] },
-      books: { type: [String], default: [] },
+    level: {
+      type: String,
+      required: true,
     },
-  });
-  
-  const PhaseSchema = new Schema({
-    phaseTitle: { type: String, required: true },
-    phaseKeywords: { type: [String], required: true },
-    lessons: { type: [LessonSchema], required: true },
-  });
-  
-  const roadmapSchema = new Schema<RoadmapDocument>(
-    {
-      userId: {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-      },
-      skill: {
-        type: String,
-        required: true,
-      },
-      level: {
-        type: String,
-        required: true,
-      },
-      phases: { type: [PhaseSchema], required: true },
-    },
-    {
-      timestamps: true,
-    }
-  );
-  
-  const RoadmapModel = mongoose.model<RoadmapDocument>("Roadmap", roadmapSchema);
-  export default RoadmapModel;
+    phases: { type: [PhaseSchema], required: true },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const RoadmapModel = mongoose.model<RoadmapDocument>("Roadmap", roadmapSchema);
+export default RoadmapModel;

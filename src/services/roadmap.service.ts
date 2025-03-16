@@ -95,6 +95,17 @@ Return the response as a JSON object with the following structure:
     throw new Error("Invalid JSON response from OpenAI");
   }
 
+  // Ensure all sections have content
+  roadmapData.phases.forEach((phase: any) => {
+    phase.lessons.forEach((lesson: any) => {
+      lesson.sections.forEach((section: any) => {
+        if (!section.content) {
+          section.content = "Default content"; // Provide a default value
+        }
+      });
+    });
+  });
+
   // Fetch supplementary resources using phase keywords
   const keywords = [skill, ...roadmapData.phases.flatMap((phase: { phaseKeywords: string[] }) => phase.phaseKeywords)].slice(0, 5);
   const youtubeVideos = await fetchYouTubeVideos(keywords[0] || skill);
