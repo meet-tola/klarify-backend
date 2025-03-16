@@ -38,7 +38,11 @@ export interface UserDocument extends Document {
                 description: string;
                 features: string[];
             }[];
-            roadmap?: mongoose.Types.ObjectId; // Reference to the Roadmap model
+            roadmap?: mongoose.Types.ObjectId;
+            tips?: {
+                title: string;
+                content: string;
+            }[];
         }
     ];
     createdAt: Date;
@@ -158,6 +162,16 @@ const userSchema = new Schema<UserDocument>(
                     ref: "Roadmap",
                     default: null,
                 },
+                tips: [
+                    {
+                        title: {
+                            type: String,
+                        },
+                        content: {
+                            type: String,
+                        },
+                    },
+                ],
             },
         ],
     },

@@ -17,12 +17,13 @@ export const generateRoadmapContentService = async (userId: string) => {
 
   // Updated AI Prompt - Structured JSON format
   const prompt = `
-  You are an AI skill tutor generator. Your task is to generate a structured learning content in JSON format. 
-  You are to generate a course on "${skill}" for a "${level}" user. The course should be divided into phases, and each phase should have lessons. Each lesson should include:
+You are an AI skill tutor generator. Your task is to generate a structured learning content in JSON format. 
+You are to generate a course on "${skill}" for a "${level}" user. The course should be divided into phases, and each phase should have lessons. Each lesson should include:
 
 1. A lesson summary with a heading and description.
 2. Sections with different types of content, such as headings, descriptions, code examples, bold text, bullet points, and images.
 3. Resources for the lesson, including exercises, videos, articles, and books.
+4. Tips for the lesson, each with a title and content.
 
 For each phase, generate a list of keywords that will be used to fetch external resources like YouTube videos, articles, and projects.
 
@@ -60,15 +61,21 @@ Return the response as a JSON object with the following structure:
             "videos": ["string"],
             "articles": ["string"],
             "books": ["string"]
-          }
+          },
+          "tips": [
+            {
+              "title": "string",
+              "content": "string"
+            }
+          ]
         }
       ]
     }
   ]
 }
-  
-  Ensure the response is valid JSON.
-  `;
+
+Ensure the response is valid JSON.
+`;
 
   const client = new OpenAI({
     baseURL: "https://models.inference.ai.azure.com",
@@ -100,7 +107,7 @@ Return the response as a JSON object with the following structure:
     phase.lessons.forEach((lesson: any) => {
       lesson.sections.forEach((section: any) => {
         if (!section.content) {
-          section.content = "Default content"; // Provide a default value
+          section.content = "Default content";
         }
       });
     });
@@ -134,6 +141,14 @@ Return the response as a JSON object with the following structure:
       description: project.description,
       features: project.features,
     })),
+    tips: roadmapData.phases.flatMap((phase: any) =>
+      phase.lessons.flatMap((lesson: any) =>
+        lesson.tips.map((tip: { title: string; content: string }) => ({
+          title: tip.title,
+          content: tip.content,
+        }))
+      )
+    ),
   });
 
   await user.save();
