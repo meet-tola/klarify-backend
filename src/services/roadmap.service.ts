@@ -17,8 +17,12 @@ export const generateRoadmapContentService = async (userId: string) => {
 
   // Updated AI Prompt - Structured JSON format
   const prompt = `
-You are an AI skill tutor generator. Your task is to generate a structured learning content in JSON format. 
-You are to generate a course on "${skill}" for a "${level}" user. The course should be divided into phases, and each phase should have lessons. Each lesson should include:
+YYou are an AI skill tutor generator. Your task is to generate a structured learning course in JSON format.
+
+The course should be designed to teach "${skill}" at a "${level}" proficiency level. It should be comprehensive and divided into five (5) distinct phases. 
+Each phase should contain well-structured lessons with rich content.
+
+Each lesson should include:
 
 1. A lesson summary with a heading and description.
 2. Sections with different types of content, such as headings, descriptions, code examples, bold text, bullet points, and images.
