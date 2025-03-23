@@ -11,6 +11,8 @@ const appConfig = ()  => ({
 
     OPENAI_API_KEY: getEnv("OPENAI_API_KEY"),
 
+    GEMINI_API_KEY: getEnv("GEMINI_API_KEY"),
+
     YOUTUBE_API_KEY: getEnv("YOUTUBE_API_KEY"),
 
     SMTP_PASS:getEnv("SMTP_PASS"),

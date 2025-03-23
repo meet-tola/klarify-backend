@@ -41,7 +41,7 @@ export interface RoadmapDocument extends Document {
 
 const SectionSchema = new Schema({
   type: { type: String, required: true },
-  content: { type: String, default: "" },
+  content: { type: [String], default: [] },
   metadata: {
     bold: { type: Boolean, default: false },
     bullets: { type: [String], default: [] },

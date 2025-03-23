@@ -1,11 +1,23 @@
-import { OpenAI } from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { BadRequestException } from "../utils/appError";
 import UserModel from "../models/user.model";
 import RoadmapModel from "../models/roadmap.model";
 import { config } from "../config/app.config";
 import { fetchYouTubeVideos, fetchArticles, fetchProjects } from "../services/learningResources.service";
 
-const token = config.OPENAI_API_KEY;
+const apiKey = config.GEMINI_API_KEY;
+const genAI = new GoogleGenerativeAI(apiKey);
+
+const model = genAI.getGenerativeModel({
+  model: "gemini-2.0-flash",
+  generationConfig: {
+    temperature: 0.7,
+    topP: 0.95,
+    topK: 40,
+    maxOutputTokens: 4096,
+    responseMimeType: "application/json",
+  },
+});
 
 export const generateRoadmapContentService = async (userId: string) => {
   const user = await UserModel.findById(userId);
@@ -17,59 +29,64 @@ export const generateRoadmapContentService = async (userId: string) => {
 
   // Updated AI Prompt - Structured JSON format
   const prompt = `
-YYou are an AI skill tutor generator. Your task is to generate a structured learning course in JSON format.
+You are an AI skill tutor generator. Your task is to generate a structured learning course in JSON format.
 
 The course should be designed to teach "${skill}" at a "${level}" proficiency level. It should be comprehensive and divided into five (5) distinct phases. 
-Each phase should contain well-structured lessons with rich content.
+Each phase should contain well-structured lessons with rich content, similar to what you would find in a full course PDF.
 
-Each lesson should include:
+### Requirements:
+1. **Total Lessons**: Generate at least 30 lessons in total, distributed evenly across the 5 phases.
+2. **Rich Content**: Each lesson should include **400–500 words of detailed content**, with a mix of:
+   - Headings
+   - Descriptions
+   - Code examples (if applicable)
+   - Bullet points
+   - Images (if applicable)
+   - Other relevant elements
+3. **Resources**: Include resources like exercises, videos, articles, and books for each lesson.
+4. **Tips**: Provide practical tips for each lesson to help learners apply the concepts.
+5. **Keywords**: Generate a list of keywords for each phase to fetch external resources like YouTube videos, articles, and projects.
 
-1. A lesson summary with a heading and description.
-2. Sections with different types of content, such as headings, descriptions, code examples, bold text, bullet points, and images.
-3. Resources for the lesson, including exercises, videos, articles, and books.
-4. Tips for the lesson, each with a title and content.
-
-For each phase, generate a list of keywords that will be used to fetch external resources like YouTube videos, articles, and projects.
-
+### JSON Structure:
 Return the response as a JSON object with the following structure:
 {
-  "courseTitle": "string",
-  "userLevel": "string",
-  "keywords": ["string"],
+  "courseTitle": "string", // A descriptive title for the course
+  "userLevel": "string", // The proficiency level (e.g., Beginner, Intermediate, Advanced)
+  "keywords": ["string"], // General keywords for the course
   "phases": [
     {
-      "phaseTitle": "string",
-      "phaseKeywords": ["string"],
+      "phaseTitle": "string", // Title of the phase
+      "phaseKeywords": ["string"], // Keywords specific to this phase
       "lessons": [
         {
-          "lessonTitle": "string",
+          "lessonTitle": "string", // Title of the lesson
           "lessonSummary": {
-            "heading": "string",
-            "description": "string"
+            "heading": "string", // A brief heading for the lesson
+            "description": "string" // A detailed description of the lesson
           },
           "sections": [
             {
-              "type": "string",
-              "content": "string",
+              "type": "string", // Type of content (e.g., "heading", "description", "code example", "bullet points")
+              "content": ["string"], // Detailed content for the section (400–500 words per lesson)
               "metadata": {
-                "bold": "boolean",
-                "bullets": ["string"],
-                "imageLink": "string",
-                "alignment": "string",
-                "language": "string"
+                "bold": "boolean", // Whether the content should be bold
+                "bullets": ["string"], // Bullet points (if applicable)
+                "imageLink": "string", // Link to an image (if applicable)
+                "alignment": "string", // Alignment of the content (e.g., "left", "center", "right")
+                "language": "string" // Programming language (if applicable)
               }
             }
           ],
           "resources": {
-            "exercises": ["string"],
-            "videos": ["string"],
-            "articles": ["string"],
-            "books": ["string"]
+            "exercises": ["string"], // List of exercises for the lesson
+            "videos": ["string"], // List of video resources
+            "articles": ["string"], // List of article resources
+            "books": ["string"] // List of book resources
           },
           "tips": [
             {
-              "title": "string",
-              "content": "string"
+              "title": "string", // Title of the tip
+              "content": "string" // Detailed content of the tip
             }
           ]
         }
@@ -78,38 +95,37 @@ Return the response as a JSON object with the following structure:
   ]
 }
 
-Ensure the response is valid JSON.
+### Additional Instructions:
+1. Ensure the course is comprehensive and covers all essential topics for "${skill}" at the "${level}" level.
+2. Each lesson should have **400–500 words of rich content**, including:
+   - At least 2–3 headings
+   - Detailed descriptions
+   - Code examples (if applicable)
+   - Bullet points for key takeaways
+   - Images (if applicable)
+3. Distribute the lessons evenly across the 5 phases, with at least 6 lessons per phase.
+4. Return only the JSON object. Do not include any additional text, explanations, or markdown formatting.
 `;
 
-  const client = new OpenAI({
-    baseURL: "https://models.inference.ai.azure.com",
-    apiKey: token,
-  });
+  const result = await model.generateContent(prompt);
+  const content = result.response.text();
 
-  const response = await client.chat.completions.create({
-    messages: [{ role: "user", content: prompt }],
-    model: "gpt-4o",
-    temperature: 0.7,
-    max_tokens: 4096,
-  });
-
-  const content = response.choices[0]?.message?.content;
-  if (!content) throw new Error("No content received from OpenAI");
+  if (!content) throw new Error("No content received from Gemini");
 
   const jsonMatch = content.match(/\{[\s\S]*\}/);
   if (!jsonMatch) throw new Error("Failed to extract JSON");
 
   let roadmapData;
-  try {
-    roadmapData = JSON.parse(jsonMatch[0]);
-  } catch (error) {
-    throw new Error("Invalid JSON response from OpenAI");
-  }
+  roadmapData = JSON.parse(jsonMatch[0]);
+  if (!roadmapData) throw new Error("Failed to parse JSON");
 
   // Ensure all sections have content
   roadmapData.phases.forEach((phase: any) => {
     phase.lessons.forEach((lesson: any) => {
       lesson.sections.forEach((section: any) => {
+        if (Array.isArray(section.content)) {
+          section.content = section.content.join(", ");
+        }
         if (!section.content) {
           section.content = "Default content";
         }
