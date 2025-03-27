@@ -11,6 +11,7 @@ import userRoutes from "./routes/user.route";
 import skillsRoutes from "./routes/skills.route";
 import careerRoutes from "./routes/career.route";
 import roadmapRoutes from "./routes/roadmap.route";
+import goalRoutes from "./routes/goal.route";
 
 const app = express();
 const BASE_PATH = config.BASE_PATH;
@@ -27,6 +28,7 @@ app.use(`${BASE_PATH}/user`, isAuthenticated, userRoutes);
 app.use(`${BASE_PATH}/skills`, isAuthenticated, skillsRoutes);
 app.use(`${BASE_PATH}/career`, isAuthenticated, careerRoutes);
 app.use(`${BASE_PATH}/roadmap`, isAuthenticated, roadmapRoutes);
+app.use(`${BASE_PATH}/goals`, isAuthenticated, goalRoutes);
 
 // Error Handling Middleware
 app.use(errorHandler);

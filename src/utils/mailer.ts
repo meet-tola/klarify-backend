@@ -19,12 +19,28 @@ export const sendVerificationEmail = async (email: string, code: string) => {
   });
 };
 
-export const sendTaskReminderEmail = async (email: string, taskName: string) => {
+export const sendGoalReminderEmail = async (
+  email: string,
+  goalTitle: string,
+  currentProgress: number,
+  targetProgress: number,
+  daysRemaining: number
+) => {
+  const subject = `Reminder: ${goalTitle}`;
+
+  const html = `
+    <div>
+      <h2>Don't forget to work on your goal: ${goalTitle}</h2>
+      <p>Current Progress: <strong>${currentProgress}/${targetProgress}</strong></p>
+      <p>Days Remaining: <strong>${daysRemaining}</strong></p>
+      <p>Keep up the good work!</p>
+    </div>
+  `;
+
   await transporter.sendMail({
     from: `"SkillUp" <${process.env.SMTP_USER}>`,
     to: email,
-    subject: "Task Reminder",
-    html: `<h2>Task Reminder</h2>
-           <p>Don't forget to complete: <b>${taskName}</b></p>`,
+    subject,
+    html,
   });
 };
