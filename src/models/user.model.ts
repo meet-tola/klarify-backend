@@ -12,7 +12,18 @@ export interface UserDocument extends Document {
         questionId: mongoose.Types.ObjectId;
         answer: string;
     }[] | null;
-    selectedSkills: string[] | null;
+    selectedSkills: {
+        primary: {
+            category: string;
+            keySkills: string[];
+            jobRoles: string[];
+        }[];
+        secondary: {
+            category: string;
+            keySkills: string[];
+            jobRoles: string[];
+        }[];
+    } | null;
     pickedSkill?: string;
     careerAssessment: {
         questionId: mongoose.Types.ObjectId;
@@ -84,8 +95,20 @@ const userSchema = new Schema<UserDocument>(
             default: null,
         },
         selectedSkills: {
-            type: [String],
-            default: [],
+            primary: [
+                {
+                    category: { type: String, required: true },
+                    keySkills: [{ type: String }],
+                    jobRoles: [{ type: String }],
+                },
+            ],
+            secondary: [
+                {
+                    category: { type: String, required: true },
+                    keySkills: [{ type: String }],
+                    jobRoles: [{ type: String }],
+                },
+            ],
         },
         pickedSkill: {
             type: String,

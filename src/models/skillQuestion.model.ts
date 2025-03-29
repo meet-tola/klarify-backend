@@ -1,10 +1,15 @@
 import mongoose, { Document, Schema } from "mongoose";
 
+interface SkillMapping {
+  primary: string[];
+  secondary: string[];
+}
+
 export interface skillQuestionDocument extends Document {
   questionText: string;
   options: string[];
   skillMapping: {
-    [key: string]: string[];
+    [key: string]: SkillMapping;
   };
 }
 

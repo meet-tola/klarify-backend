@@ -26,42 +26,40 @@ export const saveSkillsAssessment = asyncHandler(async (req: Request, res: Respo
   const { userId } = req.params;
   const { answers } = req.body;
 
-  // Check if user exists
+  // Validate user existence
   const user = await UserModel.findById(userId);
   if (!user) {
     throw new NotFoundException("User not found");
   }
 
-  // Validate and format answers
+  // Validate and structure answers
   const formattedAnswers = answers.map((answer: { questionId: string; answer: string }) => {
-    // Check if questionId is a valid 24-character hex string
     if (!mongoose.isValidObjectId(answer.questionId)) {
       throw new Error(`Invalid questionId: ${answer.questionId}`);
     }
-
     return {
-      questionId: new mongoose.Types.ObjectId(answer.questionId), // Convert to ObjectId
+      questionId: new mongoose.Types.ObjectId(answer.questionId),
       answer: answer.answer,
     };
   });
 
-  // Save the skills assessment
+  // Update user's skills assessment
   user.skillsAssessment = formattedAnswers;
+
+  // Find and assign suggested skills
+  const { primarySkills, secondarySkills } = await findSkillsService(answers);
+  user.selectedSkills = {
+    primary: primarySkills.length > 0 ? primarySkills : [],
+    secondary: secondarySkills.length > 0 ? secondarySkills : [],
+  };
   await user.save();
 
-  // Find suggested skills based on answers
-  const suggestedSkills = await findSkillsService(answers);
-
-  // Update user's selected skills
-  user.selectedSkills = suggestedSkills.map((skill) => skill.category);
-  await user.save();
-
-  res.status(HTTPSTATUS.CREATED).json({
-    message: "Skills assessment saved and skills suggested",
-    suggestedSkills: user.selectedSkills,
+  res.status(201).json({
+    message: "Skills assessment saved successfully",
+    suggestedSkills: { primary: primarySkills, secondary: secondarySkills },
+    selectedSkills: user.selectedSkills,
   });
 });
-
 
 
 export const getSuggestedSkills = asyncHandler(async (req: Request, res: Response) => {
@@ -102,11 +100,11 @@ export const searchSkills = asyncHandler(async (req: Request, res: Response) => 
   // If no query is provided, return all skills
   const filter = query
     ? {
-        $or: [
-          { category: { $regex: query as string, $options: "i" } },
-          { description: { $regex: query as string, $options: "i" } },
-        ],
-      }
+      $or: [
+        { category: { $regex: query as string, $options: "i" } },
+        { description: { $regex: query as string, $options: "i" } },
+      ],
+    }
     : {};
 
   const skills = await SkillModel.find(filter, { category: 1, description: 1, _id: 0 });

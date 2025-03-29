@@ -3,192 +3,388 @@ import SkillModel from "../models/skill.model";
 import connectDB from "../config/database.config";
 
 const skills = [
+  // Development
   {
     category: "Web Development",
-    keySkills: ["HTML", "CSS", "JavaScript", "React"],
-    jobRoles: ["Web Developer", "Frontend Developer"],
+    keySkills: ["HTML", "CSS", "JavaScript", "React", "Vue", "Angular"],
+    jobRoles: ["Web Developer", "Frontend Developer", "Full-Stack Developer"],
     description: "Building and maintaining websites and web applications using modern technologies.",
   },
   {
-    category: "UI/UX Design",
-    keySkills: ["Figma", "Adobe XD", "User Research"],
-    jobRoles: ["UI Designer", "UX Researcher"],
-    description: "Designing intuitive and user-friendly interfaces to enhance user experience.",
-  },
-  {
-    category: "Digital Marketing",
-    keySkills: ["SEO", "Google Ads", "Social Media Marketing"],
-    jobRoles: ["Marketing Specialist", "SEO Analyst"],
-    description: "Promoting brands and products through online channels to drive engagement and sales.",
-  },
-  {
-    category: "Data Science",
-    keySkills: ["Python", "Machine Learning", "Data Analysis"],
-    jobRoles: ["Data Scientist", "Data Analyst"],
-    description: "Extracting insights and building predictive models from large datasets.",
-  },
-  {
-    category: "Cybersecurity",
-    keySkills: ["Network Security", "Ethical Hacking", "Penetration Testing"],
-    jobRoles: ["Cybersecurity Analyst", "Ethical Hacker"],
-    description: "Protecting systems and networks from cyber threats and vulnerabilities.",
-  },
-  {
-    category: "Project Management",
-    keySkills: ["Agile", "Scrum", "Leadership"],
-    jobRoles: ["Project Manager", "Scrum Master"],
-    description: "Planning and executing projects efficiently to achieve business goals.",
-  },
-  {
-    category: "Mobile Development",
-    keySkills: ["Swift", "Kotlin", "Flutter"],
-    jobRoles: ["Mobile Developer", "iOS Developer", "Android Developer"],
-    description: "Creating mobile applications for iOS and Android platforms.",
-  },
-  {
-    category: "Cloud Computing",
-    keySkills: ["AWS", "Azure", "Google Cloud"],
-    jobRoles: ["Cloud Engineer", "DevOps Engineer"],
-    description: "Managing and deploying applications on cloud platforms for scalability and reliability.",
-  },
-  {
     category: "Backend Development",
-    keySkills: ["Node.js", "Django", "Ruby on Rails"],
-    jobRoles: ["Backend Developer", "Full Stack Developer"],
-    description: "Developing server-side logic and databases to power web applications.",
+    keySkills: ["Node.js", "Express", "Django", "Ruby on Rails", "Spring Boot"],
+    jobRoles: ["Backend Developer", "API Developer", "Software Engineer"],
+    description: "Developing server-side logic, APIs, and database management for applications.",
   },
   {
-    category: "Blockchain",
-    keySkills: ["Solidity", "Ethereum", "Smart Contracts"],
-    jobRoles: ["Blockchain Developer", "Crypto Analyst"],
-    description: "Building decentralized applications and working with blockchain technologies.",
+    category: "Full-Stack Development",
+    keySkills: ["MERN Stack", "MEAN Stack", "LAMP Stack"],
+    jobRoles: ["Full-Stack Developer", "Software Engineer"],
+    description: "Combining frontend and backend development to create complete web applications.",
   },
   {
-    category: "Artificial Intelligence",
-    keySkills: ["TensorFlow", "NLP", "Deep Learning"],
-    jobRoles: ["AI Engineer", "Machine Learning Engineer"],
-    description: "Creating intelligent systems and algorithms to mimic human decision-making.",
+    category: "Mobile App Development",
+    keySkills: ["Flutter", "React Native", "Swift", "Kotlin"],
+    jobRoles: ["Mobile App Developer", "iOS Developer", "Android Developer"],
+    description: "Designing and developing mobile applications for iOS and Android platforms.",
+  },
+  {
+    category: "Low-Code/No-Code Development",
+    keySkills: ["Bubble", "OutSystems", "Adalo"],
+    jobRoles: ["No-Code Developer", "Low-Code Developer"],
+    description: "Creating applications with minimal coding using drag-and-drop platforms.",
   },
   {
     category: "Game Development",
-    keySkills: ["Unity", "Unreal Engine", "C#"],
-    jobRoles: ["Game Developer", "Level Designer"],
+    keySkills: ["Unity", "Unreal Engine", "C#", "C++"],
+    jobRoles: ["Game Developer", "Game Programmer", "Gameplay Engineer"],
     description: "Designing and developing interactive games for various platforms.",
   },
   {
-    category: "DevOps",
-    keySkills: ["Docker", "Kubernetes", "CI/CD"],
-    jobRoles: ["DevOps Engineer", "Site Reliability Engineer"],
-    description: "Streamlining software development and deployment processes for efficiency.",
+    category: "Database Management",
+    keySkills: ["SQL", "MongoDB", "PostgreSQL", "Oracle"],
+    jobRoles: ["Database Administrator", "Database Engineer"],
+    description: "Managing and optimizing databases for applications and enterprises.",
+  },
+  {
+    category: "Blockchain & Smart Contracts(Web3)",
+    keySkills: ["Solidity", "Ethereum", "Hyperledger"],
+    jobRoles: ["Blockchain Developer", "Smart Contract Engineer"],
+    description: "Developing decentralized applications and smart contracts.",
+  },
+
+  // Design & Creative
+  {
+    category: "UI/UX Design",
+    keySkills: ["Figma", "Adobe XD", "Sketch"],
+    jobRoles: ["UI/UX Designer", "Product Designer"],
+    description: "Creating intuitive and visually appealing user interfaces and experiences.",
   },
   {
     category: "Graphic Design",
-    keySkills: ["Photoshop", "Illustrator", "InDesign"],
-    jobRoles: ["Graphic Designer", "Creative Director"],
-    description: "Creating visual content to communicate messages and ideas effectively.",
+    keySkills: ["Photoshop", "Illustrator", "Canva"],
+    jobRoles: ["Graphic Designer", "Visual Designer"],
+    description: "Designing visual content, branding, and marketing materials.",
   },
   {
-    category: "Database Management",
-    keySkills: ["SQL", "MongoDB", "Database Optimization"],
-    jobRoles: ["Database Administrator", "Data Engineer"],
-    description: "Managing and optimizing databases for efficient data storage and retrieval.",
+    category: "Motion Graphics & Animation",
+    keySkills: ["After Effects", "Blender", "Cinema 4D"],
+    jobRoles: ["Motion Designer", "Animator"],
+    description: "Creating animated content for videos, advertisements, and presentations.",
   },
   {
-    category: "E-commerce",
-    keySkills: ["Shopify", "WooCommerce", "Digital Sales"],
-    jobRoles: ["E-commerce Specialist", "Online Store Manager"],
-    description: "Building and managing online stores to drive sales and customer engagement.",
+    category: "3D Modeling & Rendering",
+    keySkills: ["Blender", "Maya", "3ds Max"],
+    jobRoles: ["3D Artist", "3D Modeler"],
+    description: "Designing and rendering 3D assets for various applications.",
   },
   {
-    category: "Augmented Reality/Virtual Reality",
-    keySkills: ["ARKit", "VR Development", "3D Modeling"],
-    jobRoles: ["AR/VR Developer", "Immersive Experience Designer"],
-    description: "Creating immersive experiences using AR and VR technologies.",
+    category: "Game Art & Concept Design",
+    keySkills: ["Photoshop", "Procreate", "ZBrush"],
+    jobRoles: ["Game Artist", "Concept Artist"],
+    description: "Creating visual concepts, characters, and assets for games.",
   },
   {
-    category: "Internet of Things (IoT)",
-    keySkills: ["IoT Protocols", "Embedded Systems", "Sensor Integration"],
-    jobRoles: ["IoT Developer", "Smart Device Engineer"],
-    description: "Connecting and managing smart devices to enable seamless communication.",
+    category: "Branding & Visual Identity",
+    keySkills: ["Logo Design", "Typography", "Brand Guidelines"],
+    jobRoles: ["Brand Designer", "Marketing Designer"],
+    description: "Developing and maintaining brand identities.",
   },
   {
-    category: "Business Intelligence",
-    keySkills: ["Power BI", "Tableau", "Data Visualization"],
-    jobRoles: ["BI Analyst", "Data Strategist"],
-    description: "Transforming data into actionable insights for business decision-making.",
+    category: "Product Design & Prototyping",
+    keySkills: ["CAD", "3D Printing", "Prototyping"],
+    jobRoles: ["Product Designer", "Industrial Designer"],
+    description: "Designing and prototyping physical or digital products.",
   },
   {
-    category: "Software Testing",
-    keySkills: ["Selenium", "Manual Testing", "Automation Testing"],
-    jobRoles: ["QA Engineer", "Test Automation Specialist"],
-    description: "Ensuring software quality through rigorous testing and debugging.",
+    category: "Video Editing",
+    keySkills: ["Premiere Pro", "Final Cut Pro", "DaVinci Resolve"],
+    jobRoles: ["Video Editor", "Content Creator"],
+    description: "Editing and producing professional-quality videos.",
   },
   {
-    category: "Tech Beginner",
-    keySkills: ["Introduction to Tech", "Basic Computer Skills", "Online Learning"],
-    jobRoles: ["Tech Enthusiast", "Career Explorer"],
-    description: "Starting your journey in tech with foundational knowledge and skills.",
+    category: "Digital Illustration & Digital Art",
+    keySkills: ["Procreate", "Krita", "Adobe Fresco"],
+    jobRoles: ["Digital Illustrator", "Concept Artist"],
+    description: "Creating digital artworks for various media.",
+  },
+
+  // Marketing & Business
+  {
+    "category": "Digital Marketing",
+    "keySkills": ["SEO", "PPC Advertising", "Email Marketing", "Conversion Rate Optimization"],
+    "jobRoles": ["Digital Marketer", "SEO Specialist", "Growth Hacker"],
+    "description": "Promoting brands and products through online channels using data-driven strategies."
   },
   {
-    category: "Adaptability",
-    keySkills: ["Flexibility", "Learning Agility", "Problem-Solving"],
-    jobRoles: ["Versatile Professional", "Lifelong Learner"],
-    description: "Thriving in dynamic environments by embracing change and learning quickly.",
+    "category": "Social Media Management",
+    "keySkills": ["Community Engagement", "Content Scheduling", "Analytics", "Platform Algorithms"],
+    "jobRoles": ["Social Media Manager", "Brand Strategist"],
+    "description": "Managing and optimizing brand presence across social media platforms."
   },
   {
-    category: "Team Collaboration",
-    keySkills: ["Communication", "Teamwork", "Conflict Resolution"],
-    jobRoles: ["Team Player", "Collaborative Leader"],
-    description: "Working effectively with others to achieve common goals.",
+    "category": "Influencer Marketing",
+    "keySkills": ["Partnership Negotiation", "Campaign Tracking", "Audience Alignment"],
+    "jobRoles": ["Influencer Manager", "Brand Collaborator"],
+    "description": "Leveraging influencers to amplify brand reach and credibility."
   },
   {
-    category: "Leadership",
-    keySkills: ["Decision-Making", "Mentorship", "Strategic Planning"],
-    jobRoles: ["Team Lead", "Manager", "Entrepreneur"],
-    description: "Guiding teams and organizations towards success through vision and strategy.",
+    "category": "Copywriting",
+    "keySkills": ["Persuasive Writing", "A/B Testing", "Brand Voice Development"],
+    "jobRoles": ["Copywriter", "Creative Director"],
+    "description": "Crafting compelling text for advertisements, websites, and marketing materials."
   },
   {
-    category: "Hands-on Practice",
-    keySkills: ["Project-Based Learning", "Experimentation", "Prototyping"],
-    jobRoles: ["DIY Enthusiast", "Practical Learner"],
-    description: "Learning by doing and applying knowledge in real-world scenarios.",
+    "category": "E-commerce & Dropshipping",
+    "keySkills": ["Shopify", "Product Sourcing", "Supply Chain Logistics"],
+    "jobRoles": ["E-commerce Manager", "Dropshipping Entrepreneur"],
+    "description": "Building and managing online stores with minimal inventory overhead."
   },
   {
-    category: "Self-Learning",
-    keySkills: ["Online Courses", "Research", "Self-Paced Study"],
-    jobRoles: ["Independent Learner", "Autodidact"],
-    description: "Taking charge of your own education and skill development.",
+    "category": "Affiliate Marketing",
+    "keySkills": ["Commission Structures", "Link Tracking", "Niche Targeting"],
+    "jobRoles": ["Affiliate Marketer", "Revenue Optimizer"],
+    "description": "Earning commissions by promoting third-party products or services."
   },
   {
-    category: "Work-Life Balance",
-    keySkills: ["Time Management", "Stress Management", "Mindfulness"],
-    jobRoles: ["Balanced Professional", "Wellness Advocate"],
-    description: "Maintaining a healthy balance between professional and personal life.",
+    "category": "Product Management",
+    "keySkills": ["Roadmapping", "User Stories", "MVP Development"],
+    "jobRoles": ["Product Manager", "Product Owner"],
+    "description": "Overseeing product lifecycles from ideation to launch and iteration."
+  },
+
+  // Content & Communication
+  {
+    "category": "Content Writing & Blogging",
+    "keySkills": ["SEO Writing", "Long-Form Content", "Editorial Calendars"],
+    "jobRoles": ["Blogger", "Content Writer"],
+    "description": "Creating informative and engaging written content for audiences."
   },
   {
-    category: "Creative Thinking",
-    keySkills: ["Ideation", "Design Thinking", "Innovation"],
-    jobRoles: ["Creative Professional", "Innovator"],
-    description: "Generating new ideas and solutions through creative problem-solving.",
+    "category": "Technical Writing",
+    "keySkills": ["API Documentation", "User Manuals", "Technical Guides"],
+    "jobRoles": ["Technical Writer", "Documentation Specialist"],
+    "description": "Translating complex technical information into clear, accessible content."
   },
   {
-    category: "Problem-Solving",
-    keySkills: ["Critical Thinking", "Analytical Skills", "Decision-Making"],
-    jobRoles: ["Analyst", "Consultant", "Strategist"],
-    description: "Identifying and solving complex problems with logical and analytical approaches.",
+    "category": "Scriptwriting for Videos & Podcasts",
+    "keySkills": ["Storyboarding", "Dialogue Writing", "Pacing"],
+    "jobRoles": ["Scriptwriter", "Video Producer"],
+    "description": "Writing scripts for multimedia content to engage audiences."
   },
   {
-    category: "Content Creation",
-    keySkills: ["Writing", "Video Editing", "Storytelling"],
-    jobRoles: ["Content Creator", "Blogger", "YouTuber"],
-    description: "Producing engaging content to inform, entertain, and inspire audiences.",
+    "category": "Social Media Content Creation",
+    "keySkills": ["Short-Form Video", "Memes", "Trend Analysis"],
+    "jobRoles": ["Content Creator", "Social Media Specialist"],
+    "description": "Designing visually appealing and shareable content for social platforms."
   },
-  
+  {
+    "category": "UX Writing",
+    "keySkills": ["Microcopy", "User Flows", "Accessibility Guidelines"],
+    "jobRoles": ["UX Writer", "Product Content Strategist"],
+    "description": "Crafting concise, user-friendly text for digital interfaces."
+  },
+  {
+    "category": "Public Speaking",
+    "keySkills": ["Storytelling", "Audience Engagement", "Speech Writing"],
+    "jobRoles": ["Keynote Speaker", "Presenter"],
+    "description": "Communicating ideas effectively to live or virtual audiences."
+  },
+  {
+    "category": "Content Strategy",
+    "keySkills": ["Audience Research", "Content Audits", "Omnichannel Planning"],
+    "jobRoles": ["Content Strategist", "Marketing Director"],
+    "description": "Designing and executing long-term content plans to meet business goals."
+  },
+
+  // Data & AI
+  {
+    category: "Data Analysis",
+    keySkills: ["Excel", "Python", "SQL"],
+    jobRoles: ["Data Analyst", "Business Analyst"],
+    description: "Analyzing data to extract insights and inform decisions.",
+  },
+  {
+    category: "Machine Learning",
+    keySkills: ["Scikit-learn", "TensorFlow", "PyTorch"],
+    jobRoles: ["Machine Learning Engineer", "AI Engineer"],
+    description: "Developing machine learning models for various applications.",
+  },
+  {
+    category: "Deep Learning",
+    keySkills: ["Neural Networks", "PyTorch", "Keras"],
+    jobRoles: ["Deep Learning Engineer", "AI Researcher"],
+    description: "Building and training deep neural networks for AI applications.",
+  },
+  {
+    category: "Generative AI & LLMs",
+    keySkills: ["GPT", "Stable Diffusion", "LangChain"],
+    jobRoles: ["AI Engineer", "Prompt Engineer"],
+    description: "Developing and working with generative AI models.",
+  },
+
+  // Cybersecurity & Ethical Hacking
+  {
+    category: "Penetration Testing & Ethical Hacking",
+    keySkills: ["Metasploit", "Kali Linux", "Burp Suite"],
+    jobRoles: ["Ethical Hacker", "Security Analyst"],
+    description: "Identifying and fixing security vulnerabilities in systems.",
+  },
+  {
+    category: "Cloud Security & Compliance",
+    keySkills: ["AWS Security", "ISO 27001", "SOC 2"],
+    jobRoles: ["Cloud Security Engineer", "Compliance Analyst"],
+    description: "Ensuring security compliance and protecting cloud infrastructure.",
+  },
+  {
+    category: "Digital Forensics",
+    keySkills: ["Forensic Tools", "Incident Response"],
+    jobRoles: ["Forensic Analyst", "Cybersecurity Investigator"],
+    description: "Investigating cyber incidents and recovering digital evidence.",
+  },
+
+  // Infrastructure & DevOps
+  {
+    category: "Cloud Computing",
+    keySkills: ["AWS", "Azure", "Google Cloud"],
+    jobRoles: ["Cloud Engineer", "Cloud Architect", "DevOps Engineer"],
+    description: "Deploying and managing applications in cloud environments.",
+  },
+  {
+    category: "Containerization",
+    keySkills: ["Docker", "Kubernetes", "Podman"],
+    jobRoles: ["DevOps Engineer", "Cloud Engineer"],
+    description: "Using containerization technology to deploy and manage applications efficiently.",
+  },
+  {
+    category: "Linux/Unix Administration",
+    keySkills: ["Bash", "Shell Scripting", "System Administration"],
+    jobRoles: ["System Administrator", "DevOps Engineer"],
+    description: "Managing Linux/Unix-based servers and automating administrative tasks.",
+  },
+  {
+    category: "Networking & Security",
+    keySkills: ["Firewalls", "VPN", "IDS/IPS"],
+    jobRoles: ["Network Engineer", "Security Engineer"],
+    description: "Securing and managing network infrastructure.",
+  },
+  {
+    category: "Scripting",
+    keySkills: ["Python", "Bash", "PowerShell"],
+    jobRoles: ["DevOps Engineer", "SRE (Site Reliability Engineer)"],
+    description: "Automating system processes and workflows using scripts.",
+  },
+
+  // Emerging Tech & Others
+  {
+    category: "Quantum Computing",
+    keySkills: ["Qiskit", "Quantum Circuits"],
+    jobRoles: ["Quantum Computing Researcher", "Quantum Engineer"],
+    description: "Developing and researching quantum computing applications.",
+  },
+  {
+    category: "Robotics & Automation",
+    keySkills: ["ROS", "Arduino", "Automation Tools"],
+    jobRoles: ["Robotics Engineer", "Automation Engineer"],
+    description: "Building and programming robotic systems.",
+  },
+  {
+    category: "IoT (Internet of Things)",
+    keySkills: ["Raspberry Pi", "Arduino", "IoT Security"],
+    jobRoles: ["IoT Engineer", "Embedded Systems Engineer"],
+    description: "Developing and securing IoT devices and networks.",
+  },
+
+  //Soft Skill
+  {
+    "category": "Entrepreneurship",
+    "keySkills": ["Business Planning", "Startup Funding", "Market Research", "Pitching"],
+    "jobRoles": ["Founder", "Entrepreneur", "Startup Consultant"],
+    "description": "Creating and scaling new business ventures with innovative ideas."
+  },
+  {
+    "category": "Leadership",
+    "keySkills": ["Team Management", "Decision-Making", "Conflict Resolution", "Mentorship"],
+    "jobRoles": ["Team Lead", "Manager", "Executive"],
+    "description": "Guiding teams and organizations toward shared goals with vision and strategy."
+  },
+  {
+    "category": "Project Management",
+    "keySkills": ["Agile", "Scrum", "Risk Management", "Stakeholder Communication"],
+    "jobRoles": ["Project Manager", "Product Owner", "Program Manager"],
+    "description": "Planning, executing, and closing projects efficiently while meeting objectives."
+  },
+  {
+    "category": "Content Creation",
+    "keySkills": ["Copywriting", "Video Production", "Social Media Content", "Storyboarding"],
+    "jobRoles": ["Content Creator", "Social Media Manager", "Video Producer"],
+    "description": "Producing engaging digital content for audiences across platforms."
+  },
+  {
+    "category": "Problem Solving",
+    "keySkills": ["Critical Thinking", "Root Cause Analysis", "Logical Reasoning"],
+    "jobRoles": ["Consultant", "Analyst", "Engineer"],
+    "description": "Identifying solutions to complex challenges through structured approaches."
+  },
+  {
+    "category": "Creative Thinking",
+    "keySkills": ["Ideation", "Brainstorming", "Design Thinking"],
+    "jobRoles": ["Designer", "Innovation Strategist", "Creative Director"],
+    "description": "Generating original ideas and unconventional solutions."
+  },
+  {
+    "category": "Team Collaboration",
+    "keySkills": ["Active Listening", "Feedback", "Cross-Functional Coordination"],
+    "jobRoles": ["Team Member", "Collaborator", "Coordinator"],
+    "description": "Working effectively with others to achieve shared outcomes."
+  },
+  {
+    "category": "Continuous Learning",
+    "keySkills": ["Self-Paced Study", "Online Courses", "Skill Stacking"],
+    "jobRoles": ["Lifelong Learner", "Career Switcher", "Student"],
+    "description": "Commitment to ongoing personal and professional development."
+  },
+  {
+    "category": "Hands-on Learning",
+    "keySkills": ["Prototyping", "Experimentation", "DIY Projects"],
+    "jobRoles": ["Maker", "Tinkerer", "Hobbyist"],
+    "description": "Learning through practical application and iterative testing."
+  },
+  {
+    "category": "Community Engagement",
+    "keySkills": ["Volunteering", "Public Speaking", "Networking"],
+    "jobRoles": ["Community Manager", "Nonprofit Worker", "Activist"],
+    "description": "Connecting with and mobilizing groups for social impact."
+  },
+  {
+    "category": "Emerging Tech",
+    "keySkills": ["AI Ethics", "Tech Scouting", "Future Trends Analysis"],
+    "jobRoles": ["Innovation Researcher", "Tech Futurist", "Emerging Tech Analyst"],
+    "description": "Exploring and evaluating cutting-edge technological advancements."
+  },
+  {
+    "category": "Leisure Activities",
+    "keySkills": ["Hobbies", "Work-Life Balance", "Recreation"],
+    "jobRoles": ["Enthusiast", "Hobbyist"],
+    "description": "Activities pursued for personal enjoyment and relaxation."
+  },
+  {
+    "category": "Practical Skills",
+    "keySkills": ["Tool Proficiency", "Troubleshooting", "Adaptability"],
+    "jobRoles": ["Technician", "Handyman", "Generalist"],
+    "description": "Applying functional knowledge to real-world tasks."
+  },
+  {
+    "category": "Tech Beginner",
+    "keySkills": ["Foundational Literacy", "Curiosity", "Growth Mindset"],
+    "jobRoles": ["Trainee", "Apprentice", "Newcomer"],
+    "description": "Early-stage exploration of digital tools and concepts."
+  }
 ];
 
 const seedSkills = async () => {
   await connectDB();
-  await SkillModel.deleteMany(); 
+  await SkillModel.deleteMany();
   await SkillModel.insertMany(skills);
   console.log("Skills have been seeded.");
   process.exit();
