@@ -229,7 +229,8 @@ const skills = [
     keySkills: ["Metasploit", "Kali Linux", "Burp Suite"],
     jobRoles: ["Ethical Hacker", "Security Analyst"],
     description: "Identifying and fixing security vulnerabilities in systems.",
-  },
+  }, 
+
   {
     category: "Cloud Security & Compliance",
     keySkills: ["AWS Security", "ISO 27001", "SOC 2"],

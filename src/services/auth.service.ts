@@ -43,9 +43,13 @@ export const registerUserService = async (body: {
 export const verifyUserService = async (email: string, password: string) => {
   const user = (await UserModel.findOne({ email })) as UserDocument;
   if (!user) throw new NotFoundException("User not found for the given account");
-
-  const isMatch = await user.comparePassword(password);
-  if (!isMatch) throw new UnauthorizedException("Invalid email or password");
+  
+  try {
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) throw new UnauthorizedException("Invalid email or password");
+  } catch (error) {
+    throw error;
+  }
 
   return { user: user.omitPassword() };
 };

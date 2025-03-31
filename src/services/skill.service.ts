@@ -87,11 +87,6 @@ export const selectSkillService = async (userId: string, pickedSkill: string) =>
     throw new NotFoundException("User not found");
   }
 
-  // Check if the picked skill is in the user's selected skills
-  if (!Array.isArray(user.selectedSkills) || !user.selectedSkills.includes(pickedSkill)) {
-    throw new NotFoundException("Skill not in suggested skills");
-  }
-
   // Update the user's picked skill
   user.pickedSkill = pickedSkill;
   await user.save();
