@@ -8,6 +8,8 @@ export interface UserDocument extends Document {
     password?: string;
     lastLogin: Date | null;
     verificationCode?: string;
+    resetToken?: string;
+    resetTokenExpiry?: Date | null;
     skillsAssessment: {
         questionId: mongoose.Types.ObjectId;
         answer: string;
@@ -84,6 +86,14 @@ const userSchema = new Schema<UserDocument>(
         verificationCode: {
             type: String,
             required: false
+        },
+        resetToken: {
+            type: String,
+            default: null,
+        },
+        resetTokenExpiry: {
+            type: Date,
+            default: null,
         },
         skillsAssessment: {
             type: [

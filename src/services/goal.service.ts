@@ -1,7 +1,7 @@
 import GoalModel from "../models/goal.model";
 import UserModel from "../models/user.model";
 import { NotFoundException, BadRequestException } from "../utils/appError";
-import { sendGoalReminderEmail } from "../utils/mailer";
+import { sendGoalReminderEmail } from "../emails/mailer";
 import { scheduleJob, cancelJob, RecurrenceRule } from "node-schedule";
 
 // Store scheduled jobs in memory

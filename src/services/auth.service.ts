@@ -1,11 +1,13 @@
 import mongoose from "mongoose";
+import { v4 as uuidv4 } from 'uuid';
 import UserModel, { UserDocument } from "../models/user.model";
 import {
   BadRequestException,
   NotFoundException,
   UnauthorizedException,
 } from "../utils/appError";
-import { sendVerificationEmail } from "../utils/mailer";
+import { sendPasswordResetEmail, sendVerificationEmail } from "../emails/mailer";
+import { config } from "../config/app.config";
 
 export const registerUserService = async (body: {
   email: string;
@@ -85,15 +87,49 @@ export const resendVerificationCodeService = async (userId: string) => {
   return { message: "Verification code resent successfully" };
 };
 
-export const resetPasswordService = async (
-  userId: string,
-  newPassword: string
-) => {
-  const user = await UserModel.findById(userId);
-  if (!user) throw new NotFoundException("User not found");
+export const requestPasswordResetService = async (email: string) => {
+  const user = await UserModel.findOne({ email });
+  if (!user) return;
 
-  user.password = newPassword;
+  const name = user.name || "User"; 
+
+  const resetToken = uuidv4();
+  const resetTokenExpiry = new Date(Date.now() + 3600000);
+  
+  user.resetToken = resetToken;
+  user.resetTokenExpiry = resetTokenExpiry;
   await user.save();
 
-  return { message: "Password reset successfully" };
+  // Send email with reset link
+  const resetUrl = `${config.FRONTEND_URL}/reset-password/${resetToken}`;
+  await sendPasswordResetEmail(user.email, name, resetUrl);
+};
+
+export const validatePasswordResetTokenService = async (token: string) => {
+  const user = await UserModel.findOne({
+    resetToken: token,
+    resetTokenExpiry: { $gt: Date.now() }
+  });
+
+  if (!user) {
+    throw new UnauthorizedException("Invalid or expired password reset token");
+  }
+
+  return true;
+};
+
+export const completePasswordResetService = async (token: string, newPassword: string) => {
+  const user = await UserModel.findOne({
+    resetToken: token,
+    resetTokenExpiry: { $gt: Date.now() }
+  });
+
+  if (!user) {
+    throw new UnauthorizedException("Invalid or expired password reset token");
+  }
+
+  user.password = newPassword;
+  user.resetToken = undefined;
+  user.resetTokenExpiry = undefined;
+  await user.save();
 };

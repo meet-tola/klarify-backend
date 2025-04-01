@@ -7,7 +7,9 @@ import {
   verifyUserService,
   confirmVerificationCodeService,
   resendVerificationCodeService,
-  resetPasswordService
+  validatePasswordResetTokenService,
+  completePasswordResetService,
+  requestPasswordResetService
 } from "../services/auth.service";
 import { UnauthorizedException } from "../utils/appError";
 import { setToken } from "../utils/token";
@@ -61,11 +63,29 @@ export const logOut = asyncHandler(async (req: Request, res: Response) => {
   return res.status(HTTPSTATUS.OK).json({ message: "Logged out successfully" });
 });
 
-export const resetPassword = asyncHandler(async (req: Request, res: Response) => {
-  const { newPassword } = req.body;
-  const userId = req.user?.userId;
-  if (!userId) throw new UnauthorizedException("Session expired. Please log in again.");
+export const requestPasswordReset = asyncHandler(async (req: Request, res: Response) => {
+  const { email } = req.body;
+  await requestPasswordResetService(email);
+  
+  res.status(HTTPSTATUS.OK).json({
+    message: "If an account with that email exists, a password reset link has been sent."
+  });
+});
 
-  const response = await resetPasswordService(userId, newPassword);
-  res.status(HTTPSTATUS.OK).json(response);
+export const validateResetToken = asyncHandler(async (req: Request, res: Response) => {
+  const { token } = req.params;
+  await validatePasswordResetTokenService(token);
+  
+  res.status(HTTPSTATUS.OK).json({
+    message: "Token is valid"
+  });
+});
+
+export const completePasswordReset = asyncHandler(async (req: Request, res: Response) => {
+  const { token, newPassword } = req.body;
+  await completePasswordResetService(token, newPassword);
+  
+  res.status(HTTPSTATUS.OK).json({
+    message: "Password has been reset successfully"
+  });
 });

@@ -1,0 +1,48 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{title}}</title>
+  </head>
+  <body
+    style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 500px; margin: 0 auto; padding: 20px;"
+  >
+    <div>
+      <div style="text-align: center; margin-bottom: 20px;">
+        <img
+          src="https://res.cloudinary.com/dvvirefzi/image/upload/v1743526776/klarify-logo_v2yhrm.png"
+          alt="Logo"
+          class="logo"
+          style="max-width: 120px;"
+        />
+      </div>
+
+      <div
+        style="padding: 20px; border-radius: 10px; border: 1px solid #eee; color: #1e1c1c;"
+      >
+        <div
+          style="padding: 5px; text-align: center; font-weight: 500; font-size: 24px; color: #000000;"
+        >
+          {{title}}
+        </div>
+        <p>{{greeting}}</p>
+        <p>{{content}}</p>
+        {{#if buttonUrl}}
+        <div style="text-align: center; margin: 30px 0;">
+          <a
+            href="{{buttonUrl}}"
+            style="display: inline-block; padding: 10px 20px; font-size: 14px; font-weight: semiBold; color: white; background-color: #0f084e; text-decoration: none; border-radius: 5px;"
+          >{{buttonText}}</a>
+        </div>
+        {{/if}}
+        <p>If you have any questions, feel free to reach out to our support team.</p>
+        <p>Best regards,<br />Klarify Team</p>
+      </div>
+      <div
+        style="text-align: center; margin-top: 20px; color: #888; font-size: 0.8em;"
+      >
+        <p>This is an automated message, please do not reply to this email.</p>
+        <p>© {{year}} Klarify. All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+</html>

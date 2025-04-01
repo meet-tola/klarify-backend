@@ -5,7 +5,9 @@ import {
   verifyEmail, 
   resendVerificationCode, 
   logOut, 
-  resetPassword,
+  requestPasswordReset,
+  validateResetToken,
+  completePasswordReset,
 } from "../controllers/auth.controller";
 import isAuthenticated from "../middlewares/isAuthenticated.middleware";
 
@@ -16,6 +18,8 @@ router.post("/login", login);
 router.post("/logout", logOut); 
 router.post("/verify-email", isAuthenticated, verifyEmail); 
 router.post("/resend-verification-code", isAuthenticated, resendVerificationCode); 
-router.post("/reset-password", isAuthenticated, resetPassword); 
+router.post("/request-password-reset", requestPasswordReset); 
+router.get("/validate-reset-token/:token", validateResetToken); 
+router.post("/complete-password-reset", completePasswordReset); 
 
 export default router;
