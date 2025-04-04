@@ -18,13 +18,12 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   const body = registerSchema.parse(req.body);
   const { user } = await registerUserService(body);
 
-  // Generate JWT token
   const token = setToken(user._id.toString());
 
   res.status(HTTPSTATUS.CREATED).json({
     message: "Registration successful. Check your email for the verification code.",
     user,
-    token, // Send token in response
+    token, 
   });
 });
 
@@ -50,7 +49,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const { user } = await verifyUserService(email, password);
 
-  const token = setToken(user._id.toString()); // Generate JWT token
+  const token = setToken(user._id.toString());
 
   res.status(HTTPSTATUS.OK).json({
     message: "Logged in successfully",

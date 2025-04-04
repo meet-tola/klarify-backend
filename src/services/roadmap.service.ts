@@ -4,19 +4,24 @@ import UserModel from "../models/user.model";
 import RoadmapModel from "../models/roadmap.model";
 import { config } from "../config/app.config";
 import { fetchYouTubeVideos, fetchArticles, fetchProjects } from "../services/learningResources.service";
+import OpenAI from "openai";
 
 const apiKey = config.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
+const token = config.OPENAI_API_KEY;
+
 
 const model = genAI.getGenerativeModel({
-  model: "gemini-2.0-flash",
+  model: "gemini-1.5-flash",
   generationConfig: {
-    temperature: 0.7,
-    topP: 0.95,
-    topK: 40,
-    maxOutputTokens: 4096,
+    maxOutputTokens: 200000,
     responseMimeType: "application/json",
   },
+});
+
+const client = new OpenAI({
+  baseURL: "https://models.inference.ai.azure.com",
+  apiKey: token,
 });
 
 export const generateRoadmapContentService = async (userId: string) => {
@@ -29,88 +34,197 @@ export const generateRoadmapContentService = async (userId: string) => {
 
   // Updated AI Prompt - Structured JSON format
   const prompt = `
-You are an AI skill tutor generator. Your task is to generate a structured learning course in JSON format.
+You are an expert AI course creator specializing in comprehensive skill development. Generate a detailed, structured learning roadmap for "${skill}" at the "${level}" level in STRICT JSON format.
+Prioritize creating a complete, valid JSON structure even if it means slightly deviating from strict word counts.
 
-The course should be designed to teach "${skill}" at a "${level}" proficiency level. It should be comprehensive and divided into five (5) distinct phases. 
-Each phase should contain well-structured lessons with rich content, similar to what you would find in a full course PDF.
-
-### Requirements:
-1. **Total Lessons**: Generate at least 30 lessons in total, distributed evenly across the 5 phases.
-2. **Rich Content**: Each lesson should include **400–500 words of detailed content**, with a mix of:
-   - Headings
-   - Descriptions
-   - Code examples (if applicable)
-   - Bullet points
-   - Images (if applicable)
-   - Other relevant elements
-3. **Resources**: Include resources like exercises, videos, articles, and books for each lesson.
-4. **Tips**: Provide practical tips for each lesson to help learners apply the concepts.
-5. **Keywords**: Generate a list of keywords for each phase to fetch external resources like YouTube videos, articles, and projects.
-
-### JSON Structure:
-Return the response as a JSON object with the following structure:
+### COMPLETE COURSE STRUCTURE:
 {
-  "courseTitle": "string", // A descriptive title for the course
-  "userLevel": "string", // The proficiency level (e.g., Beginner, Intermediate, Advanced)
-  "keywords": ["string"], // General keywords for the course
+  "title": "Complete ${skill} Mastery: From ${level} to Proficient",
+  "skill": "${skill}",
+  "level": "${level}",
+  "tips": [
+    {
+      "title": "General Skill Mastery Tip 1",
+      "content": "Description of the first general tip for mastering the skill across all phases of the course."
+    },
+    {
+      "title": "General Skill Mastery Tip 2",
+      "content": "Description of the second general tip for mastering the skill across all phases of the course."
+    },
+    {
+      "title": "General Skill Mastery Tip 3",
+      "content": "Description of the third general tip for mastering the skill across all phases of the course."
+    },
+    {
+      "title": "General Skill Mastery Tip 4",
+      "content": "Description of the fourth general tip for mastering the skill across all phases of the course."
+    }
+  ],
+  "resources": {
+    "youtubeVideos": "single keyword related to ${skill} for sourcing all YouTube videos",
+    "articles": "single keyword related to ${skill} for sourcing all relevant articles",
+    "projects": [
+      {
+        "name": "Project 1 Title",
+        "description": "Brief overview of the project and its learning objectives.",
+        "features": ["Key feature 1", "Key feature 2", "Key feature 3"]
+      },
+      {
+        "name": "Project 2 Title",
+        "description": "Brief overview of the project and its learning objectives.",
+        "features": ["Key feature 1", "Key feature 2", "Key feature 3"]
+      }
+    ]
+  },
   "phases": [
     {
-      "phaseTitle": "string", // Title of the phase
-      "phaseKeywords": ["string"], // Keywords specific to this phase
+      "phaseTitle": "Phase 1: Foundations",
+      "phaseDescription": "Build core fundamentals and basic concepts",
+      "phaseKeywords": ["basics", "fundamentals", "getting-started"],
       "lessons": [
         {
-          "lessonTitle": "string", // Title of the lesson
+          "lessonTitle": "Essential ${skill} Concepts",
           "lessonSummary": {
-            "heading": "string", // A brief heading for the lesson
-            "description": "string" // A detailed description of the lesson
+            "heading": "Mastering the building blocks",
+            "description": [
+              "This lesson establishes the foundational knowledge required for ${skill}.",
+              "We'll explore core principles every ${level} practitioner needs to know.",
+              "Practical examples will demonstrate real-world application."
+            ]
           },
           "sections": [
             {
-              "type": "string", // Type of content (e.g., "heading", "description", "code example", "bullet points")
-              "content": ["string"], // Detailed content for the section (400–500 words per lesson)
-              "metadata": {
-                "bold": "boolean", // Whether the content should be bold
-                "bullets": ["string"], // Bullet points (if applicable)
-                "imageLink": "string", // Link to an image (if applicable)
-                "alignment": "string", // Alignment of the content (e.g., "left", "center", "right")
-                "language": "string" // Programming language (if applicable)
+              "sectionTitle": "Core Principles Explained",
+              "sectionType": "Concept Explanation",
+              "content": [
+                {
+                  "heading": {
+                    "text": "What is ${skill}?",
+                    "metadata": ["bold"]
+                  },
+                  "description": [
+                    {
+                      "text": "[80-120 words] Comprehensive definition covering key aspects, historical context if relevant, and modern applications. Explain why this skill matters in today's context.",
+                      "metadata": []
+                    }
+                  ],
+                  "examples": [
+                    {
+                      "type": "case-study",
+                      "content": "[50-100 words] Real-world scenario showing application",
+                      "metadata": ["warning"]
+                    }
+                  ]
+                }
+              ],
+              "keyPoints": {
+                "metadata": ["bullets"],
+                "items": [
+                  "Key takeaway 1 (15-30 words)",
+                  "Key takeaway 2 (15-30 words)"
+                ]
               }
             }
           ],
           "resources": {
-            "exercises": ["string"], // List of exercises for the lesson
-            "videos": ["string"], // List of video resources
-            "articles": ["string"], // List of article resources
-            "books": ["string"] // List of book resources
-          },
-          "tips": [
-            {
-              "title": "string", // Title of the tip
-              "content": "string" // Detailed content of the tip
-            }
-          ]
+            "exercises": ["Build a simple X", "Practice Y technique"]
+          }
         }
       ]
+    },
+    {
+      "phaseTitle": "Phase 2: Core Concepts",
+      "phaseDescription": "Deeper exploration of essential techniques",
+      "phaseKeywords": ["intermediate", "techniques", "applications"]
+      ....
+    },
+      {
+      "phaseTitle": "Phase 3: .......",
+      "phaseDescription": "......",
+      "phaseKeywords": ["......"]
+      ....
     }
   ]
 }
 
-### Additional Instructions:
-1. Ensure the course is comprehensive and covers all essential topics for "${skill}" at the "${level}" level.
-2. Each lesson should have **400–500 words of rich content**, including:
-   - At least 2–3 headings
-   - Detailed descriptions
-   - Code examples (if applicable)
-   - Bullet points for key takeaways
-   - Images (if applicable)
-3. Distribute the lessons evenly across the 5 phases, with at least 6 lessons per phase.
-4. Return only the JSON object. Do not include any additional text, explanations, or markdown formatting.
+### REQUIRED ELEMENTS FOR EACH COMPONENT:
+
+1. **PHASE REQUIREMENTS:**
+   - Title: "Phase [1-5]: [Descriptive Name]"  
+   - Description: 2-3 sentences (40-60 words).  
+   - 4-6 complete lessons per phase.
+
+2. **LESSON REQUIREMENTS:**
+   - Title: Clear focus area (e.g., "Data Structures in ${skill}").  
+   - Summary:  
+     - "heading": 1 sentence (10-15 words).  
+     - "description": 2 paragraphs (40-60 words each).  
+   - 3 detailed sections.  
+   - Resources should **only include 2-3 exercises** (no YouTube videos or articles at the lesson level).  
+
+3. **SECTION REQUIREMENTS:**
+   - Title: Specific concept/task name.  
+   - Type: One of ["Concept", "Practice", "Example"].  
+   - Content:  
+     - 2 description paragraphs (80-100 words each).  
+     - 1-2 examples (50-70 words each).  
+     - 3-5 key points (15-30 words each).  
+
+4. **RESOURCE REQUIREMENTS (Global, NOT per lesson):**
+   - **YouTube Videos:** 1 **unique keyword** related to the skill for sourcing all relevant YouTube content.  
+   - **Articles:** 1 **unique keyword** related to the skill for sourcing all relevant articles.  
+   - **Projects:**  
+     - At least **two projects** with a **title, description, and key features**.  
+
+5. **TIPS REQUIREMENTS:**
+   - 5 general **actionable** tips for the **entire course**.  
+   - Each tip should have:  
+     - A title (5-8 words).  
+     - Content (20-30 words) with relevant descriptions and metadata.  
+   - These tips should apply **to the whole course** and **not individual lessons**.  
+
+### CONTENT QUALITY CHECKS:
+1. Verify **ALL elements exist** in every lesson:  
+   - Title.  
+   - Summary (heading + description).  
+   - Sections (with complete content).  
+   - Resources (only **2-3 exercises per lesson**).  
+
+2. Validate **word counts**:  
+   - Lesson descriptions: **80-100 words total**.  
+   - Section content: **200-250 words total**.  
+
+3. **Ensure no placeholder text exists**.
+
+### FINAL OUTPUT REQUIREMENTS:
+1. **Valid JSON only**.  
+2. **5 complete phases**.  
+3. **6 lessons per phase**.  
+4. **All specified fields populated**.  
+5. **No markdown or commentary**.  
+
+STRICT REQUIREMENTS:
+IMPORTANT: Return ONLY valid JSON, with all property names double-quoted and no comments, markdown, or explanations. Use strict JSON syntax. Your output will be parsed directly by a JSON parser.
+
 `;
 
   const result = await model.generateContent(prompt);
   const content = result.response.text();
-
   if (!content) throw new Error("No content received from Gemini");
+
+
+  // const response = await client.chat.completions.create({
+  //   messages: [{ role: "user", content: prompt }],
+  //   model: "gpt-4o",
+  //   temperature: 0.7,
+  //   max_tokens: 10000,
+  // });
+
+  // const content = response.choices[0]?.message?.content;
+
+  // if (!content) throw new Error("No content received from OpenAI");
+
+  console.log("Generated content:", content);
 
   const jsonMatch = content.match(/\{[\s\S]*\}/);
   if (!jsonMatch) throw new Error("Failed to extract JSON");
@@ -119,32 +233,44 @@ Return the response as a JSON object with the following structure:
   roadmapData = JSON.parse(jsonMatch[0]);
   if (!roadmapData) throw new Error("Failed to parse JSON");
 
-  // Ensure all sections have content
   roadmapData.phases.forEach((phase: any) => {
     phase.lessons.forEach((lesson: any) => {
       lesson.sections.forEach((section: any) => {
-        if (Array.isArray(section.content)) {
-          section.content = section.content.join(", ");
-        }
         if (!section.content) {
-          section.content = "Default content";
+          section.content = [];
+        } else if (!Array.isArray(section.content)) {
+          section.content = [section.content];
         }
+  
+        section.content.forEach((contentItem: any, index: number) => {
+          if (!contentItem.heading || !contentItem.heading.text) {
+            throw new Error(
+              `Missing heading in phase: "${phase.phaseTitle}", lesson: "${lesson.lessonTitle}", section: "${section.sectionTitle}", content index: ${index}`
+            );
+          }
+        });
       });
     });
   });
+  
 
-  // Fetch supplementary resources using phase keywords
-  const keywords = [skill, ...roadmapData.phases.flatMap((phase: { phaseKeywords: string[] }) => phase.phaseKeywords)].slice(0, 5);
-  const youtubeVideos = await fetchYouTubeVideos(keywords[0] || skill);
-  const articles = await fetchArticles(keywords[0] || skill);
-  const projects = await fetchProjects(keywords[0] || skill);
+  // Fetch supplementary resources using AI-generated keywords from roadmapData
+  const youtubeVideos = await fetchYouTubeVideos(roadmapData.resources.youtubeVideos);
+  const articles = await fetchArticles(roadmapData.resources.articles);
 
   // Save roadmap to MongoDB
   const roadmap = new RoadmapModel({
     userId: user._id,
-    skill,
-    level,
+    skill:roadmapData.skill,
+    level: roadmapData.level,
+    title: roadmapData.title,
     phases: roadmapData.phases,
+    resources: {
+      articles: roadmapData.resources.articles,
+      youtubeVideos: roadmapData.resources.youtubeVideos,
+      projects: roadmapData.resources.projects
+    },
+    tips: roadmapData.tips,
   });
 
   await roadmap.save();
@@ -156,24 +282,18 @@ Return the response as a JSON object with the following structure:
     roadmap: roadmap._id,
     youtubeVideos,
     articles,
-    projects: projects.map((project: { title: string; description: string; features: string[] }) => ({
+    projects: roadmapData.resources.projects.map((project: { title: string; description: string; features: string[] }) => ({
       name: project.title,
       description: project.description,
       features: project.features,
     })),
-    tips: roadmapData.phases.flatMap((phase: any) =>
-      phase.lessons.flatMap((lesson: any) =>
-        lesson.tips.map((tip: { title: string; content: string }) => ({
-          title: tip.title,
-          content: tip.content,
-        }))
-      )
-    ),
+    tips: roadmapData.tips,
   });
 
   await user.save();
 
   return roadmap;
+
 };
 
 export const fetchRoadmapsService = async (userId: string) => {
