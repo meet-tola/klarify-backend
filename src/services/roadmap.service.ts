@@ -32,12 +32,12 @@ export const generateRoadmapContentService = async (userId: string) => {
   const skill = user.pickedSkill;
   const level = user.learningPath[0]?.level || "Beginner";
 
-  // Updated AI Prompt - Structured JSON format
+  // Updated AI Prompt - Generate basic structure without sections
   const prompt = `
 You are an expert AI course creator specializing in comprehensive skill development. Generate a detailed, structured learning roadmap for "${skill}" at the "${level}" level in STRICT JSON format.
 Prioritize creating a complete, valid JSON structure even if it means slightly deviating from strict word counts.
 
-### COMPLETE COURSE STRUCTURE:
+### COMPLETE COURSE STRUCTURE (WITHOUT SECTIONS):
 {
   "title": "Complete ${skill} Mastery: From ${level} to Proficient",
   "skill": "${skill}",
@@ -92,188 +92,62 @@ Prioritize creating a complete, valid JSON structure even if it means slightly d
               "Practical examples will demonstrate real-world application."
             ]
           },
-          "sections": [
-            {
-              "sectionTitle": "Core Principles Explained",
-              "sectionType": "Concept Explanation",
-              "content": [
-                {
-                  "heading": {
-                    "text": "What is ${skill}?",
-                    "metadata": ["bold"]
-                  },
-                  "description": [
-                    {
-                      "text": "[80-120 words] Comprehensive definition covering key aspects, historical context if relevant, and modern applications. Explain why this skill matters in today's context.",
-                      "metadata": []
-                    }
-                  ],
-                  "examples": [
-                    {
-                      "type": "case-study",
-                      "content": "[50-100 words] Real-world scenario showing application",
-                      "metadata": ["warning"]
-                    }
-                  ]
-                }
-              ],
-              "keyPoints": {
-                "metadata": ["bullets"],
-                "items": [
-                  "Key takeaway 1 (15-30 words)",
-                  "Key takeaway 2 (15-30 words)"
-                ]
-              }
-            }
-          ],
+          "sections": [], // LEAVE THIS EMPTY - SECTIONS WILL BE GENERATED LATER
           "resources": {
             "exercises": ["Build a simple X", "Practice Y technique"]
           }
         }
       ]
-    },
-    {
-      "phaseTitle": "Phase 2: Core Concepts",
-      "phaseDescription": "Deeper exploration of essential techniques",
-      "phaseKeywords": ["intermediate", "techniques", "applications"]
-      ....
-    },
-      {
-      "phaseTitle": "Phase 3: .......",
-      "phaseDescription": "......",
-      "phaseKeywords": ["......"]
-      ....
     }
   ]
 }
 
-### REQUIRED ELEMENTS FOR EACH COMPONENT:
-
-1. **PHASE REQUIREMENTS:**
-   - Title: "Phase [1-5]: [Descriptive Name]"  
-   - Description: 2-3 sentences (40-60 words).  
-   - 4-6 complete lessons per phase.
-
-2. **LESSON REQUIREMENTS:**
-   - Title: Clear focus area (e.g., "Data Structures in ${skill}").  
-   - Summary:  
-     - "heading": 1 sentence (10-15 words).  
-     - "description": 2 paragraphs (40-60 words each).  
-   - 3 detailed sections.  
-   - Resources should **only include 2-3 exercises** (no YouTube videos or articles at the lesson level).  
-
-3. **SECTION REQUIREMENTS:**
-   - Title: Specific concept/task name.  
-   - Type: One of ["Concept", "Practice", "Example"].  
-   - Content:  
-     - 2 description paragraphs (80-100 words each).  
-     - 1-2 examples (50-70 words each).  
-     - 3-5 key points (15-30 words each).  
-
-4. **RESOURCE REQUIREMENTS (Global, NOT per lesson):**
-   - **YouTube Videos:** 1 **unique keyword** related to the skill for sourcing all relevant YouTube content.  
-   - **Articles:** 1 **unique keyword** related to the skill for sourcing all relevant articles.  
-   - **Projects:**  
-     - At least **two projects** with a **title, description, and key features**.  
-
-5. **TIPS REQUIREMENTS:**
-   - 5 general **actionable** tips for the **entire course**.  
-   - Each tip should have:  
-     - A title (5-8 words).  
-     - Content (20-30 words) with relevant descriptions and metadata.  
-   - These tips should apply **to the whole course** and **not individual lessons**.  
-
-### CONTENT QUALITY CHECKS:
-1. Verify **ALL elements exist** in every lesson:  
-   - Title.  
-   - Summary (heading + description).  
-   - Sections (with complete content).  
-   - Resources (only **2-3 exercises per lesson**).  
-
-2. Validate **word counts**:  
-   - Lesson descriptions: **80-100 words total**.  
-   - Section content: **200-250 words total**.  
-
-3. **Ensure no placeholder text exists**.
-
-### FINAL OUTPUT REQUIREMENTS:
-1. **Valid JSON only**.  
-2. **5 complete phases**.  
-3. **6 lessons per phase**.  
-4. **All specified fields populated**.  
-5. **No markdown or commentary**.  
-
-STRICT REQUIREMENTS:
-IMPORTANT: Return ONLY valid JSON, with all property names double-quoted and no comments, markdown, or explanations. Use strict JSON syntax. Your output will be parsed directly by a JSON parser.
-
+### REQUIREMENTS:
+1. Generate 6 complete phases with 6-8 lessons each
+2. Leave "sections" array empty for all lessons
+3. Include all other required fields (title, summary, resources, etc.)
+4. Ensure valid JSON output with no comments or markdown
 `;
 
   const result = await model.generateContent(prompt);
   const content = result.response.text();
   if (!content) throw new Error("No content received from Gemini");
 
-
-  // const response = await client.chat.completions.create({
-  //   messages: [{ role: "user", content: prompt }],
-  //   model: "gpt-4o",
-  //   temperature: 0.7,
-  //   max_tokens: 10000,
-  // });
-
-  // const content = response.choices[0]?.message?.content;
-
-  // if (!content) throw new Error("No content received from OpenAI");
-
-  console.log("Generated content:", content);
-
   const jsonMatch = content.match(/\{[\s\S]*\}/);
   if (!jsonMatch) throw new Error("Failed to extract JSON");
 
   let roadmapData;
   roadmapData = JSON.parse(jsonMatch[0]);
+
+
   if (!roadmapData) throw new Error("Failed to parse JSON");
 
-  roadmapData.phases.forEach((phase: any) => {
-    phase.lessons.forEach((lesson: any) => {
-      lesson.sections.forEach((section: any) => {
-        if (!section.content) {
-          section.content = [];
-        } else if (!Array.isArray(section.content)) {
-          section.content = [section.content];
-        }
-  
-        section.content.forEach((contentItem: any, index: number) => {
-          if (!contentItem.heading || !contentItem.heading.text) {
-            throw new Error(
-              `Missing heading in phase: "${phase.phaseTitle}", lesson: "${lesson.lessonTitle}", section: "${section.sectionTitle}", content index: ${index}`
-            );
-          }
-        });
-      });
-    });
-  });
-  
+  // Validate the basic structure
+  if (!roadmapData.phases || !Array.isArray(roadmapData.phases)) {
+    throw new Error("Invalid phases data");
+  }
 
   // Fetch supplementary resources using AI-generated keywords from roadmapData
   const youtubeVideos = await fetchYouTubeVideos(roadmapData.resources.youtubeVideos);
   const articles = await fetchArticles(roadmapData.resources.articles);
 
-  // Save roadmap to MongoDB
+  // Save roadmap to MongoDB without sections
   const roadmap = new RoadmapModel({
     userId: user._id,
-    skill:roadmapData.skill,
+    skill: roadmapData.skill,
     level: roadmapData.level,
     title: roadmapData.title,
     phases: roadmapData.phases,
     resources: {
-      articles: roadmapData.resources.articles,
-      youtubeVideos: roadmapData.resources.youtubeVideos,
+      youtubeVideos,
+      articles,
       projects: roadmapData.resources.projects
     },
     tips: roadmapData.tips,
   });
 
   await roadmap.save();
+
 
   // Save to userModel.learningPath
   user.learningPath.push({
@@ -282,8 +156,8 @@ IMPORTANT: Return ONLY valid JSON, with all property names double-quoted and no 
     roadmap: roadmap._id,
     youtubeVideos,
     articles,
-    projects: roadmapData.resources.projects.map((project: { title: string; description: string; features: string[] }) => ({
-      name: project.title,
+    projects: roadmapData.resources.projects.map((project: { name: string; description: string; features: string[] }) => ({
+      name: project.name,
       description: project.description,
       features: project.features,
     })),
@@ -293,7 +167,239 @@ IMPORTANT: Return ONLY valid JSON, with all property names double-quoted and no 
   await user.save();
 
   return roadmap;
+};
 
+export const generateLessonSectionsService = async (userId: string, roadmapId: string, phaseIndex: number = 0): Promise<{ roadmap: any; completed: boolean; nextPhaseIndex?: number } | { completed: boolean; message: string }> => {
+  const user = await UserModel.findById(userId);
+  if (!user) throw new BadRequestException("User not found");
+
+  const roadmap = await RoadmapModel.findOne({
+    _id: roadmapId,
+    userId
+  });
+  if (!roadmap) throw new BadRequestException("Roadmap not found or doesn't belong to user");
+
+  // 2. Check if we've processed all phases
+  if (phaseIndex >= roadmap.phases.length) {
+    return {
+      roadmap,
+      completed: true
+    };
+  }
+
+  const phase = roadmap.phases[phaseIndex];
+  let hasGeneratedSections = false;
+
+  // 3. Process each lesson in the phase
+  for (let lessonIndex = 0; lessonIndex < phase.lessons.length; lessonIndex++) {
+    const lesson = phase.lessons[lessonIndex];
+
+    // Skip if lesson already has sections
+    if (lesson.sections && lesson.sections.length > 0) continue;
+
+    // Generate sections for this lesson
+    const prompt = `
+You are an expert AI course creator. Generate detailed sections for the following lesson in STRICT JSON format.
+
+### LESSON DETAILS:
+- Skill: ${roadmap.skill}
+- Level: ${roadmap.level}
+- Phase: ${phase.phaseTitle}
+- Lesson Title: ${lesson.lessonTitle}
+- Lesson Summary: ${JSON.stringify(lesson.lessonSummary)}
+
+Generate a JSON object with a "sections" array containing three objects.
+{
+  "sections": [
+    {
+      "sectionTitle": "Title (6-8 words)",
+      "sectionType": "Concept Explanation",
+      "keyPoints": {
+        "metadata": ["bullets"],
+        "items": [
+          "15-30 word key takeaway",
+          "15-30 word key takeaway",
+          "15-30 word key takeaway"
+        ]
+      }
+      "content": [
+        {
+          "heading": {
+            "text": "Specific concept (4-6 words)",
+            "metadata": ["bold"]
+          },
+          "description": [
+            {
+              "text": "80-120 word detailed explanation",
+              "metadata": []
+            }
+          ],
+          "examples": [
+            {
+              "type": "case-study",
+              "content": "50-100 word practical example",
+              "metadata": []
+            }
+          ]
+        }
+      ],
+      
+    },
+    {
+      "sectionTitle": "Title (6-8 words)",
+      "sectionType": "Practical Exercise",
+      "keyPoints": {
+        "metadata": ["bullets"],
+        "items": [
+          "15-30 word key takeaway",
+          "15-30 word key takeaway",
+          "15-30 word key takeaway"
+        ]
+      }
+      "content": [
+        {
+          "heading": {
+            "text": "Specific concept (4-6 words)",
+            "metadata": ["bold"]
+          },
+          "description": [
+            {
+              "text": "80-120 word detailed explanation",
+              "metadata": []
+            }
+          ],
+          "examples": [
+            {
+              "type": "code-sample",
+              "content": "50-100 word practical example",
+              "metadata": []
+            }
+          ]
+        }
+      ],
+      
+    },
+    {
+      "sectionTitle": "Title (6-8 words)",
+      "sectionType": "Case Study",
+      "keyPoints": {
+        "metadata": ["bullets"],
+        "items": [
+          "15-30 word key takeaway",
+          "15-30 word key takeaway",
+          "15-30 word key takeaway"
+        ]
+      }
+      "content": [
+        {
+          "heading": {
+            "text": "Specific concept (4-6 words)",
+            "metadata": ["bold"]
+          },
+          "description": [
+            {
+              "text": "80-120 word detailed explanation",
+              "metadata": []
+            }
+          ],
+          "examples": [
+            {
+              "type": "analogy",
+              "content": "50-100 word practical example",
+              "metadata": []
+            }
+          ]
+        }
+      ],
+      
+    }
+  ]
+}
+
+
+`;
+
+    const response = await client.chat.completions.create({
+      messages: [{ role: "user", content: prompt }],
+      model: "gpt-4o",
+      temperature: 0.7,
+      max_tokens: 10000,
+    });
+
+    const content = response.choices[0]?.message?.content;
+
+    if (!content) throw new Error("No content received from OpenAI");
+
+    // const result = await model.generateContent(prompt);
+    // const content = result.response.text();
+    // if (!content) throw new Error("No content received from Gemini");
+
+    console.log("Generated content:", content);
+
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error("Failed to extract JSON");
+
+    function sanitizeJSON(input: string): string {
+      return input.replace(/,\s*}/g, '}').replace(/,\s*]/g, ']');
+    }
+
+
+    let rawJSON = jsonMatch?.[0];
+    rawJSON = sanitizeJSON(rawJSON);
+
+    let sectionsData;
+    try {
+      sectionsData = JSON.parse(rawJSON);
+
+      // Validate each section within the array
+      sectionsData.sections.forEach((section: any) => {
+        if (!section.sectionTitle || !section.sectionType || !Array.isArray(section.content) || typeof section.keyPoints !== 'object' || !Array.isArray(section.keyPoints.items)) {
+          console.error("Malformed JSON (Invalid section structure):", JSON.stringify(section, null, 2));
+          throw new Error('Invalid section structure');
+        }
+        if (section.content.some((c: any) => c.keyPoints)) {
+          console.error("Malformed JSON ('keyPoints' found in content):", JSON.stringify(section.content.find((c: any) => c.keyPoints), null, 2));
+          throw new Error('keyPoints found in content array');
+        }
+      });
+    } catch (err: any) {
+      console.error('Sanitized JSON:', rawJSON);
+      throw new Error(`JSON parsing failed: ${err.message}`);
+    }
+
+    if (!sectionsData?.sections || !Array.isArray(sectionsData.sections)) {
+      throw new Error("Invalid sections data format");
+    }
+
+    // Validate sections structure
+    sectionsData.sections.forEach((section: any) => {
+      if (!section.sectionTitle || !section.sectionType || !section.content || !section.keyPoints) {
+        throw new Error("Invalid section structure");
+      }
+    });
+
+    // Update the lesson with the generated sections
+    lesson.sections = sectionsData.sections;
+    hasGeneratedSections = true;
+  }
+
+  // 4. Save changes if we generated any sections
+  if (hasGeneratedSections) {
+    roadmap.markModified(`phases.${phaseIndex}.lessons`);
+    await roadmap.save();
+  }
+
+  // 5. Determine if we should continue to next phase
+  const allPhasesCompleted = phaseIndex >= roadmap.phases.length - 1;
+  const currentPhaseFullyProcessed = phase.lessons.every(
+    lesson => lesson.sections && lesson.sections.length > 0
+  );
+
+  return {
+    roadmap,
+    completed: allPhasesCompleted && currentPhaseFullyProcessed,
+    nextPhaseIndex: currentPhaseFullyProcessed ? phaseIndex + 1 : phaseIndex
+  };
 };
 
 export const fetchRoadmapsService = async (userId: string) => {

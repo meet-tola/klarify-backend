@@ -49,7 +49,7 @@ interface Lesson {
     heading: string;
     description: string[];
   };
-  sections: Section[];
+  sections?: Section[];
   resources: {
     exercises: string[];
   };
@@ -70,8 +70,16 @@ export interface RoadmapDocument extends Document {
   level: string;
   phases: Phase[];
   resources: {
-    youtubeVideos: string;
-    articles: string;
+    youtubeVideos?: {
+      title: string;
+      url: string;
+      thumbnail: string;
+    }[];
+    articles?: {
+      title: string;
+      url: string;
+      author: string;
+    }[];
     projects: Project[];
   };
   tips: Tip[];
@@ -97,7 +105,7 @@ const HeadingSchema = new Schema({
 
 const ContentItemSchema = new Schema({
   heading: { type: HeadingSchema },
-  description: { type: [DescriptionItemSchema]},
+  description: { type: [DescriptionItemSchema] },
   examples: { type: [ExampleSchema], default: [] }
 });
 
@@ -130,9 +138,9 @@ const LessonSchema = new Schema({
     heading: { type: String, required: true },
     description: { type: [String], required: true }
   },
-  sections: { type: [SectionSchema], required: true },
+  sections: { type: [SectionSchema], required: true, default: [] },
   resources: {
-    exercises: { type: [String], required: true } // Only exercises inside lessons
+    exercises: { type: [String], required: true }
   }
 });
 
@@ -164,11 +172,35 @@ const roadmapSchema = new Schema<RoadmapDocument>(
     },
     phases: { type: [PhaseSchema], required: true },
     resources: {
-      youtubeVideos: { type: String, required: true }, 
-      articles: { type: String, required: true },
+      youtubeVideos: [
+        {
+          title: {
+            type: String,
+          },
+          url: {
+            type: String,
+          },
+          thumbnail: {
+            type: String,
+          },
+        },
+      ],
+      articles: [
+        {
+          title: {
+            type: String,
+          },
+          url: {
+            type: String,
+          },
+          author: {
+            type: String,
+          },
+        },
+      ],
       projects: { type: [ProjectSchema], required: true }
     },
-    tips: { type: [TipSchema], required: true } 
+    tips: { type: [TipSchema], required: true }
   },
   {
     timestamps: true

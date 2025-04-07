@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { generateRoadmapContentService, fetchRoadmapsService } from "../services/roadmap.service";
+import { generateRoadmapContentService, fetchRoadmapsService, generateLessonSectionsService } from "../services/roadmap.service";
 import { asyncHandler } from "../middlewares/asyncHandler.middleware";
 import UserModel from "../models/user.model";
 import RoadmapModel from "../models/roadmap.model";
@@ -16,6 +16,23 @@ export const getRoadmaps = asyncHandler(async (req: Request, res: Response) => {
   const roadmaps = await fetchRoadmapsService(userId);
   res.status(200).json({ roadmaps });
 });
+
+export const generateRoadmapSections = async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const { roadmapId, phaseIndex = 0 } = req.body;
+
+  if (typeof roadmapId !== 'string') {
+    throw new BadRequestException("Invalid or missing roadmapId");
+  }
+
+  const result = await generateLessonSectionsService(
+    userId,
+    roadmapId,
+    typeof phaseIndex === 'string' ? parseInt(phaseIndex) : 0
+  );
+
+  res.status(200).json(result);
+};
 
 
 export const getLearningPathAndRoadmapBySkill = asyncHandler(async (req: Request, res: Response) => {
