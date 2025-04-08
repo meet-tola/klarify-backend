@@ -6,7 +6,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from "../utils/appError";
-import { sendPasswordResetEmail, sendVerificationEmail } from "../emails/mailer";
+import { sendPasswordResetEmail, sendVerificationEmail, sendWelcomeEmail } from "../emails/mailer";
 import { config } from "../config/app.config";
 
 export const registerUserService = async (body: {
@@ -49,6 +49,7 @@ export const verifyUserService = async (email: string, password: string) => {
   try {
     const isMatch = await user.comparePassword(password);
     if (!isMatch) throw new UnauthorizedException("Invalid email or password");
+    await sendWelcomeEmail(user.email, user.name || "User"); 
   } catch (error) {
     throw error;
   }
@@ -79,7 +80,7 @@ export const resendVerificationCodeService = async (userId: string) => {
 
   // Generate new verification code (no hashing)
   const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-  user.verificationCode = verificationCode; // Store plain text code
+  user.verificationCode = verificationCode; 
   await user.save();
 
   await sendVerificationEmail(user.email, verificationCode);
