@@ -1,56 +1,126 @@
+<!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>{{title}}</title>
-  </head>
-  <body
-    style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 500px; margin: 0 auto; padding: 20px;"
-  >
-    <div>
-      <div style="text-align: center; margin-bottom: 20px;">
-        <img
-          src="https://res.cloudinary.com/dvvirefzi/image/upload/v1743526776/klarify-logo_v2yhrm.png"
-          alt="Logo"
-          class="logo"
-          style="max-width: 120px;"
-        />
-      </div>
-
-      <div
-        style="padding: 20px; border-radius: 10px; border: 1px solid #eee; color: #1e1c1c;"
-      >
-        <div
-          style="padding: 5px; text-align: center; font-weight: 500; font-size: 24px; color: #000000;"
-        >
-          Goal Reminder: {{goalTitle}}
-        </div>
-        <p>{{greeting}}</p>
-        <p>Here's an update on your goal progress:</p>
-        
-        <div style="margin: 20px 0; background-color: #f5f5f5; padding: 15px; border-radius: 5px;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-            <span>Progress:</span>
-            <span>{{currentProgress}}/{{targetProgress}} ({{progressPercentage currentProgress targetProgress}}%)</span>
-          </div>
-          <div style="height: 10px; background-color: #e0e0e0; border-radius: 5px; margin-bottom: 10px;">
-            <div style="height: 100%; width: {{progressPercentage currentProgress targetProgress}}%; background-color: #0f084e; border-radius: 5px;"></div>
-          </div>
-          <div style="display: flex; justify-content: space-between;">
-            <span>Time remaining:</span>
-            <span>{{daysRemaining}} day{{#if (gt daysRemaining 1)}}s{{/if}}</span>
-          </div>
-        </div>
-
-        <p>Keep up the good work! You're making progress toward your goal.</p>
-        <p>Need motivation? Remember why you set this goal in the first place!</p>
-        <p>Best regards,<br />Klarify Team</p>
-      </div>
-      <div
-        style="text-align: center; margin-top: 20px; color: #888; font-size: 0.8em;"
-      >
-        <p>This is an automated message, please do not reply to this email.</p>
-        <p>© {{year}} Klarify. All rights reserved.</p>
-      </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{title}}</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+    }
+    .header {
+      background-color: #f8f9fa;
+      padding: 20px;
+      text-align: center;
+      border-bottom: 1px solid #eaeaea;
+    }
+    .content {
+      padding: 30px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      margin: 0 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    .title {
+      font-size: 24px;
+      font-weight: 600;
+      color: #0f084e;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .progress-container {
+      margin: 25px 0;
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #eaeaea;
+    }
+    .progress-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #555;
+    }
+    .progress-bar-container {
+      height: 12px;
+      background-color: #e0e0e0;
+      border-radius: 6px;
+      margin: 12px 0;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background-color: #0f084e;
+      border-radius: 6px;
+    }
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: #888;
+      font-size: 12px;
+      background-color: #f8f9fa;
+      border-top: 1px solid #eaeaea;
+    }
+    p {
+      margin: 16px 0;
+      color: #555;
+    }
+    .logo {
+      max-width: 120px;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="https://res.cloudinary.com/dvvirefzi/image/upload/v1743526776/klarify-logo_v2yhrm.png" alt="Klarify Logo" class="logo" />
     </div>
-  </body>
+    
+    <div class="content">
+      <div class="title">Goal Reminder: {{goalTitle}}</div>
+      
+      <p>{{greeting}}</p>
+      
+      <p>Here's an update on your goal progress:</p>
+      
+      <div class="progress-container">
+        <div class="progress-row">
+          <span>Progress:</span>
+          <span>{{currentProgress}}/{{targetProgress}} ({{progressPercentage currentProgress targetProgress}}%)</span>
+        </div>
+        
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: {{progressPercentage currentProgress targetProgress}}%;"></div>
+        </div>
+        
+        <div class="progress-row">
+          <span>Time remaining:</span>
+          <span>{{daysRemaining}} day{{#if (gt daysRemaining 1)}}s{{/if}}</span>
+        </div>
+      </div>
+      
+      <p>Keep up the good work! You're making progress toward your goal.</p>
+      
+      <p>Need motivation? Remember why you set this goal in the first place!</p>
+      
+      <p>Best regards,<br />The Klarify Team</p>
+    </div>
+    
+    <div class="footer">
+      <p>This is an automated message, please do not reply to this email.</p>
+      <p>© {{year}} Klarify. All rights reserved.</p>
+    </div>
+  </div>
+</body>
 </html>
