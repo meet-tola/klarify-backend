@@ -20,6 +20,7 @@ const appConfig = ()  => ({
 
     FRONTEND_URL: getEnv("FRONTEND_URL", "localhost"),
     FRONTEND_ORIGIN: getEnv("FRONTEND_ORIGIN"),
+    SERVER_DOMAIN: getEnv("SERVER_DOMAIN", `http://localhost:${getEnv("PORT", "5000")}`),
 })
 
 export const config = appConfig();
