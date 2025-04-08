@@ -78,7 +78,7 @@ const questions = [
     }
   }, 
   {
-    "questionText": "If you had unlimited time, what side project would you start?",
+    "questionText": "If you had unlimited time, what side project are you more likely to start?",
     "options": [
       "Building a website or an app",
       "Creating a game or interactive experience",

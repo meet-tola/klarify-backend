@@ -24,7 +24,7 @@ app.use(express.static(path.join(__dirname, "../public")));
 app.use(express.json());
 
 // app.use(cookieParser());
-app.use(cors({ origin: config.FRONTEND_ORIGIN, credentials: true }));
+app.use(cors({ origin: config.FRONTEND_URL, credentials: true }));
 
 // Routes
 app.use(`${BASE_PATH}/auth`, authRoutes);

@@ -18,8 +18,7 @@ const appConfig = ()  => ({
     SMTP_PASS:getEnv("SMTP_PASS"),
     SMTP_USER: getEnv("SMTP_USER"),
 
-    FRONTEND_URL: getEnv("FRONTEND_URL", "localhost"),
-    FRONTEND_ORIGIN: getEnv("FRONTEND_ORIGIN"),
+    FRONTEND_URL: getEnv("FRONTEND_URL"),
     SERVER_DOMAIN: getEnv("SERVER_DOMAIN", `http://localhost:${getEnv("PORT", "5000")}`),
 })
 

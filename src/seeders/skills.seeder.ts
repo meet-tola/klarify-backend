@@ -225,11 +225,23 @@ const skills = [
 
   // Cybersecurity & Ethical Hacking
   {
+    category: "Cybersecurity",
+    keySkills: ["Network Security", "Firewalls", "Security Monitoring"],
+    jobRoles: ["Cybersecurity Analyst", "Security Engineer"],
+    description: "Safeguarding systems, networks, and data from digital attacks and unauthorized access.",
+  },
+  {
+    category: "Ethical Hacking",
+    keySkills: ["Penetration Testing", "Metasploit", "Kali Linux"],
+    jobRoles: ["Ethical Hacker", "Penetration Tester"],
+    description: "Legally probing systems for vulnerabilities to help organizations strengthen their defenses.",
+  },
+  {
     category: "Penetration Testing & Ethical Hacking",
     keySkills: ["Metasploit", "Kali Linux", "Burp Suite"],
     jobRoles: ["Ethical Hacker", "Security Analyst"],
     description: "Identifying and fixing security vulnerabilities in systems.",
-  }, 
+  },
 
   {
     category: "Cloud Security & Compliance",
