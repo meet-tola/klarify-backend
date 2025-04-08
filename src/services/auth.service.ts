@@ -45,11 +45,10 @@ export const registerUserService = async (body: {
 export const verifyUserService = async (email: string, password: string) => {
   const user = (await UserModel.findOne({ email })) as UserDocument;
   if (!user) throw new NotFoundException("User not found for the given account");
-  
+
   try {
     const isMatch = await user.comparePassword(password);
     if (!isMatch) throw new UnauthorizedException("Invalid email or password");
-    await sendWelcomeEmail(user.email, user.name || "User"); 
   } catch (error) {
     throw error;
   }
@@ -70,6 +69,7 @@ export const confirmVerificationCodeService = async (
 
   user.verificationCode = undefined;
   await user.save();
+  await sendWelcomeEmail(user.email, user.name || "User");
 
   return { user: user.omitPassword() };
 };
@@ -80,7 +80,7 @@ export const resendVerificationCodeService = async (userId: string) => {
 
   // Generate new verification code (no hashing)
   const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-  user.verificationCode = verificationCode; 
+  user.verificationCode = verificationCode;
   await user.save();
 
   await sendVerificationEmail(user.email, verificationCode);
@@ -92,11 +92,11 @@ export const requestPasswordResetService = async (email: string) => {
   const user = await UserModel.findOne({ email });
   if (!user) return;
 
-  const name = user.name || "User"; 
+  const name = user.name || "User";
 
   const resetToken = uuidv4();
   const resetTokenExpiry = new Date(Date.now() + 3600000);
-  
+
   user.resetToken = resetToken;
   user.resetTokenExpiry = resetTokenExpiry;
   await user.save();
