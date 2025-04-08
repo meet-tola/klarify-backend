@@ -44,19 +44,19 @@ Prioritize creating a complete, valid JSON structure even if it means slightly d
   "level": "${level}",
   "tips": [
     {
-      "title": "General Skill Mastery Tip 1",
+      "title": "Good title for the first general tip",
       "content": "Description of the first general tip for mastering the skill across all phases of the course."
     },
     {
-      "title": "General Skill Mastery Tip 2",
+      "title": "Good title for the second general tip",
       "content": "Description of the second general tip for mastering the skill across all phases of the course."
     },
     {
-      "title": "General Skill Mastery Tip 3",
+      "title": "Good title for the third general tip",
       "content": "Description of the third general tip for mastering the skill across all phases of the course."
     },
     {
-      "title": "General Skill Mastery Tip 4",
+      "title": "Good title for the fourth general tip",
       "content": "Description of the fourth general tip for mastering the skill across all phases of the course."
     }
   ],
@@ -71,6 +71,11 @@ Prioritize creating a complete, valid JSON structure even if it means slightly d
       },
       {
         "name": "Project 2 Title",
+        "description": "Brief overview of the project and its learning objectives.",
+        "features": ["Key feature 1", "Key feature 2", "Key feature 3"]
+      }
+        {
+        "name": "Project 3 Title",
         "description": "Brief overview of the project and its learning objectives.",
         "features": ["Key feature 1", "Key feature 2", "Key feature 3"]
       }
@@ -109,9 +114,20 @@ Prioritize creating a complete, valid JSON structure even if it means slightly d
 4. Ensure valid JSON output with no comments or markdown
 `;
 
-  const result = await model.generateContent(prompt);
-  const content = result.response.text();
-  if (!content) throw new Error("No content received from Gemini");
+  const response = await client.chat.completions.create({
+    messages: [{ role: "user", content: prompt }],
+    model: "gpt-4o",
+    temperature: 0.7,
+    max_tokens: 10000,
+  });
+
+  const content = response.choices[0]?.message?.content;
+
+  if (!content) throw new Error("No content received from OpenAI");
+
+  // const result = await model.generateContent(prompt);
+  // const content = result.response.text();
+  // if (!content) throw new Error("No content received from Gemini");
 
   const jsonMatch = content.match(/\{[\s\S]*\}/);
   if (!jsonMatch) throw new Error("Failed to extract JSON");
