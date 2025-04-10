@@ -109,9 +109,10 @@ Prioritize creating a complete, valid JSON structure even if it means slightly d
 
 ### REQUIREMENTS:
 1. Generate 6 complete phases with 6-8 lessons each
-2. Leave "sections" array empty for all lessons
-3. Include all other required fields (title, summary, resources, etc.)
-4. Ensure valid JSON output with no comments or markdown
+2. 6 phases must completely cover the skill from beginner to advanced level
+3. Leave "sections" array empty for all lessons
+4. Include all other required fields (title, summary, resources, etc.)
+5. Ensure valid JSON output with no comments or markdown
 `;
 
   const response = await client.chat.completions.create({
