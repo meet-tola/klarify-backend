@@ -130,6 +130,15 @@ Prioritize creating a complete, valid JSON structure even if it means slightly d
     } 
   ]
 }
+### PHASE PROGRESSION GUIDE:
+1. Phase 1: Absolute Fundamentals
+2. Phase 2: Core Concepts
+3. Phase 3: Practical Applications
+4. Phase 4: Intermediate Techniques
+5. Phase 5: Advanced Topics
+6. Phase 6: Mastery and Real-world Implementation
+
+Remember: Your response MUST contain exactly 6 phases or i will be rejected!
 
 ### REQUIREMENTS:
 1. Generate 6 complete phases with 6-8 lessons each
@@ -143,7 +152,7 @@ Prioritize creating a complete, valid JSON structure even if it means slightly d
     messages: [{ role: "user", content: prompt }],
     model: "gpt-4o",
     temperature: 0.7,
-    max_tokens: 10000,
+    max_tokens: 15000,
   });
 
   const content = response.choices[0]?.message?.content;
@@ -374,9 +383,7 @@ Generate a JSON object with a "sections" array containing three objects.
     // const result = await model.generateContent(prompt);
     // const content = result.response.text();
     // if (!content) throw new Error("No content received from Gemini");
-
-    console.log("Generated content:", content);
-
+    
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error("Failed to extract JSON");
 
