@@ -58,7 +58,6 @@ interface Lesson {
 interface Phase {
   phaseTitle: string;
   phaseDescription: string;
-  phaseKeywords: string[];
   lessons: Lesson[];
 }
 
@@ -147,7 +146,6 @@ const LessonSchema = new Schema({
 const PhaseSchema = new Schema({
   phaseTitle: { type: String, required: true },
   phaseDescription: { type: String, required: true },
-  phaseKeywords: { type: [String], required: true },
   lessons: { type: [LessonSchema], required: true }
 });
 

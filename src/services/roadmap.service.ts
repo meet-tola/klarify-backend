@@ -85,7 +85,6 @@ Prioritize creating a complete, valid JSON structure even if it means slightly d
     {
       "phaseTitle": "Phase 1: Foundations",
       "phaseDescription": "Build core fundamentals and basic concepts",
-      "phaseKeywords": ["basics", "fundamentals", "getting-started"],
       "lessons": [
         {
           "lessonTitle": "Essential ${skill} Concepts",
@@ -103,7 +102,32 @@ Prioritize creating a complete, valid JSON structure even if it means slightly d
           }
         }
       ]
-    }
+    },
+    {
+      "phaseTitle": "Core Concepts",
+      "phaseDescription": ".....",
+      "lessons": [...]
+    },
+    {
+      "phaseTitle": "Practical Applications",
+      "phaseDescription": ".....",
+      "lessons": [...]
+    },
+    {
+      "phaseTitle": "Intermediate Techniques",
+      "phaseDescription": ".....",
+      "lessons": [...]
+    },
+    {
+      "phaseTitle": "Advanced Topics",
+      "phaseDescription": ".....",
+      "lessons": [...]
+    },
+    {
+      "phaseTitle": "Mastery and Real-world Implementation",
+      "phaseDescription": ".....",
+      "lessons": [...]
+    } 
   ]
 }
 
