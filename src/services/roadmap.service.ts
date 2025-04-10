@@ -5,6 +5,7 @@ import RoadmapModel from "../models/roadmap.model";
 import { config } from "../config/app.config";
 import { fetchYouTubeVideos, fetchArticles, fetchProjects } from "../services/learningResources.service";
 import OpenAI from "openai";
+import { getMainContentPrompt, getPhasesPrompt } from "../utils/prompt";
 
 const apiKey = config.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
@@ -32,156 +33,50 @@ export const generateRoadmapContentService = async (userId: string) => {
   const skill = user.pickedSkill;
   const level = user.learningPath[0]?.level || "Beginner";
 
-  // Updated AI Prompt - Generate basic structure without sections
-  const prompt = `
-You are an expert AI course creator specializing in comprehensive skill development. Generate a detailed, structured learning roadmap for "${skill}" at the "${level}" level in STRICT JSON format.
-Prioritize creating a complete, valid JSON structure even if it means slightly deviating from strict word counts.
-
-### COMPLETE COURSE STRUCTURE (WITHOUT SECTIONS):
-{
-  "title": "Complete ${skill} Mastery: From ${level} to Proficient",
-  "skill": "${skill}",
-  "level": "${level}",
-  "tips": [
-    {
-      "title": "Good title for the first general tip",
-      "content": "Description of the first general tip for mastering the skill across all phases of the course."
-    },
-    {
-      "title": "Good title for the second general tip",
-      "content": "Description of the second general tip for mastering the skill across all phases of the course."
-    },
-    {
-      "title": "Good title for the third general tip",
-      "content": "Description of the third general tip for mastering the skill across all phases of the course."
-    },
-    {
-      "title": "Good title for the fourth general tip",
-      "content": "Description of the fourth general tip for mastering the skill across all phases of the course."
-    }
-  ],
-  "resources": {
-    "youtubeVideos": "single keyword related to ${skill} for sourcing all YouTube videos",
-    "articles": "single keyword related to ${skill} for sourcing all relevant articles",
-    "projects": [
-      {
-        "name": "Project 1 Title",
-        "description": "Brief overview of the project and its learning objectives.",
-        "features": ["Key feature 1", "Key feature 2", "Key feature 3"]
-      },
-      {
-        "name": "Project 2 Title",
-        "description": "Brief overview of the project and its learning objectives.",
-        "features": ["Key feature 1", "Key feature 2", "Key feature 3"]
-      }
-        {
-        "name": "Project 3 Title",
-        "description": "Brief overview of the project and its learning objectives.",
-        "features": ["Key feature 1", "Key feature 2", "Key feature 3"]
-      }
-    ]
-  },
-  "phases": [
-    {
-      "phaseTitle": "Phase 1: Foundations",
-      "phaseDescription": "Build core fundamentals and basic concepts",
-      "lessons": [
-        {
-          "lessonTitle": "Essential ${skill} Concepts",
-          "lessonSummary": {
-            "heading": "Mastering the building blocks",
-            "description": [
-              "This lesson establishes the foundational knowledge required for ${skill}.",
-              "We'll explore core principles every ${level} practitioner needs to know.",
-              "Practical examples will demonstrate real-world application."
-            ]
-          },
-          "sections": [], // LEAVE THIS EMPTY - SECTIONS WILL BE GENERATED LATER
-          "resources": {
-            "exercises": ["Build a simple X", "Practice Y technique"]
-          }
-        }
-      ]
-    },
-    {
-      "phaseTitle": "Core Concepts",
-      "phaseDescription": ".....",
-      "lessons": [...]
-    },
-    {
-      "phaseTitle": "Practical Applications",
-      "phaseDescription": ".....",
-      "lessons": [...]
-    },
-    {
-      "phaseTitle": "Intermediate Techniques",
-      "phaseDescription": ".....",
-      "lessons": [...]
-    },
-    {
-      "phaseTitle": "Advanced Topics",
-      "phaseDescription": ".....",
-      "lessons": [...]
-    },
-    {
-      "phaseTitle": "Mastery and Real-world Implementation",
-      "phaseDescription": ".....",
-      "lessons": [...]
-    } 
-  ]
-}
-### PHASE PROGRESSION GUIDE:
-1. Phase 1: Absolute Fundamentals
-2. Phase 2: Core Concepts
-3. Phase 3: Practical Applications
-4. Phase 4: Intermediate Techniques
-5. Phase 5: Advanced Topics
-6. Phase 6: Mastery and Real-world Implementation
-
-Remember: Your response MUST contain exactly 6 phases or i will be rejected!
-
-### REQUIREMENTS:
-1. Generate 6 complete phases with 6-8 lessons each
-2. 6 phases must completely cover the skill from beginner to advanced level
-3. Leave "sections" array empty for all lessons
-4. Include all other required fields (title, summary, resources, etc.)
-5. Ensure valid JSON output with no comments or markdown
-`;
-
-  const response = await client.chat.completions.create({
-    messages: [{ role: "user", content: prompt }],
+  // Generate main content (without phases)
+  const mainContentResponse = await client.chat.completions.create({
+    messages: [{ role: "user", content: getMainContentPrompt(skill, level) }],
     model: "gpt-4o",
     temperature: 0.7,
-    max_tokens: 15000,
+    max_tokens: 4000,
   });
 
-  const content = response.choices[0]?.message?.content;
+  const mainContent = mainContentResponse.choices[0]?.message?.content;
+  if (!mainContent) throw new Error("No main content received from OpenAI");
 
-  if (!content) throw new Error("No content received from OpenAI");
+  const mainContentJsonMatch = mainContent.match(/\{[\s\S]*\}/);
+  if (!mainContentJsonMatch) throw new Error("Failed to extract JSON from main content");
 
-  // const result = await model.generateContent(prompt);
-  // const content = result.response.text();
-  // if (!content) throw new Error("No content received from Gemini");
+  let roadmapData = JSON.parse(mainContentJsonMatch[0]);
+  if (!roadmapData) throw new Error("Failed to parse main content JSON");
 
-  const jsonMatch = content.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error("Failed to extract JSON");
+  // Generate phases separately
+  const phasesResponse = await client.chat.completions.create({
+    messages: [{ role: "user", content: getPhasesPrompt(skill, level) }],
+    model: "gpt-4o",
+    temperature: 0.7,
+    max_tokens: 10000,
+  });
 
-  let roadmapData;
-  roadmapData = JSON.parse(jsonMatch[0]);
+  const phasesContent = phasesResponse.choices[0]?.message?.content;
+  if (!phasesContent) throw new Error("No phases content received from OpenAI");
 
+  const phasesJsonMatch = phasesContent.match(/\[[\s\S]*\]/);
+  if (!phasesJsonMatch) throw new Error("Failed to extract JSON from phases content");
 
-  if (!roadmapData) throw new Error("Failed to parse JSON");
-
-  // Validate the basic structure
-  if (!roadmapData.phases || !Array.isArray(roadmapData.phases)) {
-    throw new Error("Invalid phases data");
+  const phasesData = JSON.parse(phasesJsonMatch[0]);
+  if (!phasesData || !Array.isArray(phasesData) || phasesData.length !== 6) {
+    throw new Error("Invalid phases data - must contain exactly 6 phases");
   }
+
+  // Combine both results
+  roadmapData.phases = phasesData;
 
   // Fetch supplementary resources using AI-generated keywords from roadmapData
   const youtubeVideos = await fetchYouTubeVideos(roadmapData.resources.youtubeVideos);
   const articles = await fetchArticles(roadmapData.resources.articles);
 
-  // Save roadmap to MongoDB without sections
+  // Save roadmap to MongoDB
   const roadmap = new RoadmapModel({
     userId: user._id,
     skill: roadmapData.skill,
@@ -197,7 +92,6 @@ Remember: Your response MUST contain exactly 6 phases or i will be rejected!
   });
 
   await roadmap.save();
-
 
   // Save to userModel.learningPath
   user.learningPath.push({
@@ -383,7 +277,7 @@ Generate a JSON object with a "sections" array containing three objects.
     // const result = await model.generateContent(prompt);
     // const content = result.response.text();
     // if (!content) throw new Error("No content received from Gemini");
-    
+
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error("Failed to extract JSON");
 

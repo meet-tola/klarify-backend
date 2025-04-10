@@ -186,6 +186,7 @@ export const clearUserSkills = asyncHandler(async (req: Request, res: Response) 
     selectedSkills: [],
     careerAssessment: null,
     skillsAssessment: null,
+    learningPath: [],
   });
 
   res.status(HTTPSTATUS.OK).json({
