@@ -6,6 +6,8 @@ export interface UserDocument extends Document {
     name: string;
     email: string;
     password?: string;
+    bio?: string;
+    profilePicture?: string;
     lastLogin: Date | null;
     verificationCode?: string;
     resetToken?: string;
@@ -78,6 +80,14 @@ const userSchema = new Schema<UserDocument>(
         password: {
             type: String,
             required: true,
+        },
+        bio: {
+            type: String,
+            required: false,
+        },
+        profilePicture: {
+            type: String,
+            required: false,
         },
         lastLogin: {
             type: Date,

@@ -4,7 +4,7 @@ interface GoalDocument extends Document {
   userId: mongoose.Types.ObjectId;
   title: string;
   description: string;
-  skill: string; // Should match user's learningPath skills
+  skill: string; 
   startDate: Date;
   endDate: Date;
   repeat: "daily" | "weekly" | "weekend" | "none";
