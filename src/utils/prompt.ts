@@ -76,18 +76,19 @@ You are an expert AI course creator specializing in comprehensive skill developm
         "sections": [],
         "resources": {
           "exercises": [
-          {
-        "name": "name of the exercise",
-        "description": "description of the exercise",
-        "task": "task to be performed",
-      },
-      {
-        "name": "name of the exercise",
-        "description": "description of the exercise",
-        "task": "task to be performed",
-      }],
-          "youtubeVideos": "single keyboard or double words related to lesson Title for sourcing all YouTube videos",
-          "articles": "single keyword or double words related to lesson Title for sourcing all relevant articles",
+            {
+              "name": "name of the exercise",
+              "description": "description of the exercise",
+              "task": "task to be performed"
+            },
+            {
+              "name": "name of the exercise",
+              "description": "description of the exercise",
+              "task": "task to be performed"
+            }
+          ],
+          "youtubeVideos": "single keyword or double words related to lesson Title for sourcing all YouTube videos",
+          "articles": "single keyword or double words related to lesson Title for sourcing all relevant articles"
         }
       }
       // 5-7 more lessons per phase
