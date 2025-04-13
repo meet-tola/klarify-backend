@@ -73,8 +73,8 @@ Return only the JSON array, without any extra text.
     }
 };
 
-export const fetchArticlesFromGoogle = async (skill: string, level: string) => {
-    const searchQuery = `${skill} ${level} tutorial OR ${skill} ${level} guide OR learn ${skill} for ${level} (article OR blog)`;
+export const fetchArticlesFromGoogle = async (query: string) => {
+    const searchQuery = `${query} (article OR blog OR guide OR tutorial)`;
 
     const response = await axios.get("https://www.googleapis.com/customsearch/v1", {
         params: {
@@ -91,8 +91,8 @@ export const fetchArticlesFromGoogle = async (skill: string, level: string) => {
     return items.map((item: any) => ({
         title: item.title,
         url: item.link,
-        snippet: item.snippet,
-        source: item.displayLink,
+        // snippet: item.snippet,
+        author: item.displayLink,
     }));
 };
 

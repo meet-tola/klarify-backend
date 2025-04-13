@@ -69,12 +69,36 @@ export const generateRoadmapContentService = async (userId: string) => {
     throw new Error("Invalid phases data - must contain exactly 6 phases");
   }
 
+  // Process each phase and fetch lesson resources
+  for (const phase of phasesData) {
+    for (const lesson of phase.lessons) {
+      // Fetch YouTube videos for the lesson
+      if (lesson.resources?.youtubeVideos) {
+        lesson.resources.youtubeVideos = await fetchYouTubeVideos(lesson.resources.youtubeVideos);
+      } else {
+        lesson.resources.youtubeVideos = [];
+      }
+
+      // Fetch articles for the lesson
+      if (lesson.resources?.articles) {
+        lesson.resources.articles = await fetchArticlesFromGoogle(lesson.resources.articles);
+      } else {
+        lesson.resources.articles = [];
+      }
+
+      // Ensure exercises exists
+      if (!lesson.resources?.exercises) {
+        lesson.resources.exercises = [];
+      }
+    }
+  }
+
   // Combine both results
   roadmapData.phases = phasesData;
 
-  // Fetch supplementary resources using AI-generated keywords from roadmapData
+  // Fetch supplementary resources for the main roadmap
   const youtubeVideos = await fetchYouTubeVideos(roadmapData.resources.youtubeVideos);
-  const articles = await fetchArticles(roadmapData.resources.articles);
+  const articles = await fetchArticlesFromGoogle(roadmapData.resources.youtubeVideos);
 
   // Save roadmap to MongoDB
   const roadmap = new RoadmapModel({
@@ -82,7 +106,20 @@ export const generateRoadmapContentService = async (userId: string) => {
     skill: roadmapData.skill,
     level: roadmapData.level,
     title: roadmapData.title,
-    phases: roadmapData.phases,
+    phases: roadmapData.phases.map((phase: { phaseTitle: string; phaseDescription: string; lessons: any[] }) => ({
+      phaseTitle: phase.phaseTitle,
+      phaseDescription: phase.phaseDescription,
+      lessons: phase.lessons.map(lesson => ({
+        lessonTitle: lesson.lessonTitle,
+        lessonSummary: lesson.lessonSummary,
+        sections: lesson.sections || [],
+        resources: {
+          exercises: lesson.resources.exercises,
+          youtubeVideos: lesson.resources.youtubeVideos,
+          articles: lesson.resources.articles
+        }
+      }))
+    })),
     resources: {
       youtubeVideos,
       articles,

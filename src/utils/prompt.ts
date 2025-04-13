@@ -26,8 +26,8 @@ Prioritize creating a complete, valid JSON structure even if it means slightly d
     }
   ],
   "resources": {
-    "youtubeVideos": "single keyword related to ${skill} for sourcing all YouTube videos",
-    "articles": "single keyword related to ${skill} for sourcing all relevant articles",
+    "youtubeVideos": "single keyword or double words related to ${skill} for sourcing all YouTube videos",
+    "articles": "single keyword or double words  related to ${skill} for sourcing all relevant articles",
     "projects": [
       {
         "name": "Project 1 Title",
@@ -75,7 +75,19 @@ You are an expert AI course creator specializing in comprehensive skill developm
         },
         "sections": [],
         "resources": {
-          "exercises": ["Build a simple X", "Practice Y technique"]
+          "exercises": [
+          {
+        "name": "name of the exercise",
+        "description": "description of the exercise",
+        "task": "task to be performed",
+      },
+      {
+        "name": "name of the exercise",
+        "description": "description of the exercise",
+        "task": "task to be performed",
+      }],
+          "youtubeVideos": "single keyboard or double words related to lesson Title for sourcing all YouTube videos",
+          "articles": "single keyword or double words related to lesson Title for sourcing all relevant articles",
         }
       }
       // 5-7 more lessons per phase

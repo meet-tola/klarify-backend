@@ -52,6 +52,8 @@ interface Lesson {
   sections?: Section[];
   resources: {
     exercises: string[];
+    youtubeVideos: string[];
+    articles: string[];
   };
 }
 
@@ -140,7 +142,14 @@ const LessonSchema = new Schema({
   },
   sections: { type: [SectionSchema], required: true, default: [] },
   resources: {
-    exercises: { type: [String], required: true }
+    exercises: [{ title: { type: String, }, description: { type: String, }, task: { type: String, }, },
+    ],
+    youtubeVideos: [{ title: { type: String, }, url: { type: String, }, thumbnail: { type: String, }, },
+    ],
+    articles: [{
+      title: { type: String, }, url: { type: String, }, author: { type: String, },
+    },
+    ],
   }
 });
 
@@ -173,7 +182,7 @@ const roadmapSchema = new Schema<RoadmapDocument>(
     sectionsGenerated: {
       type: Boolean,
       default: false,
-    },    
+    },
     resources: {
       youtubeVideos: [
         {
