@@ -68,6 +68,7 @@ export interface RoadmapDocument extends Document {
   skill: string;
   level: string;
   phases: Phase[];
+  sectionsGenerated: boolean;
   resources: {
     youtubeVideos?: {
       title: string;
@@ -169,6 +170,10 @@ const roadmapSchema = new Schema<RoadmapDocument>(
       required: true
     },
     phases: { type: [PhaseSchema], required: true },
+    sectionsGenerated: {
+      type: Boolean,
+      default: false,
+    },    
     resources: {
       youtubeVideos: [
         {

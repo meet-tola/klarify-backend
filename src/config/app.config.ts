@@ -1,6 +1,6 @@
 import { getEnv } from "../utils/get-env"
 
-const appConfig = ()  => ({
+const appConfig = () => ({
     NODE_ENV: getEnv("NODE_ENV", "development"),
     PORT: getEnv("PORT", "5000"),
     BASE_PATH: getEnv("BASE_PATH", "/api"),
@@ -14,8 +14,10 @@ const appConfig = ()  => ({
     GEMINI_API_KEY: getEnv("GEMINI_API_KEY"),
 
     YOUTUBE_API_KEY: getEnv("YOUTUBE_API_KEY"),
+    GOOGLE_SEARCH_API_KEY: getEnv("GOOGLE_SEARCH_API_KEY"),
+    GOOGLE_CX: getEnv("GOOGLE_CX"),
 
-    SMTP_PASS:getEnv("SMTP_PASS"),
+    SMTP_PASS: getEnv("SMTP_PASS"),
     SMTP_USER: getEnv("SMTP_USER"),
 
     FRONTEND_URL: getEnv("FRONTEND_URL"),

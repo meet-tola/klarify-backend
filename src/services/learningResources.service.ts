@@ -5,6 +5,8 @@ import { config } from "../config/app.config";
 const token = config.OPENAI_API_KEY;
 
 const YOUTUBE_API_KEY = config.YOUTUBE_API_KEY;
+const GOOGLE_SEARCH_API_KEY = config.GOOGLE_SEARCH_API_KEY;
+const GOOGLE_CX = config.GOOGLE_CX;
 
 export const fetchYouTubeVideos = async (query: string) => {
     const response = await axios.get("https://www.googleapis.com/youtube/v3/search", {
@@ -70,6 +72,30 @@ Return only the JSON array, without any extra text.
         throw new Error("Failed to parse JSON from OpenAI response");
     }
 };
+
+export const fetchArticlesFromGoogle = async (skill: string, level: string) => {
+    const searchQuery = `${skill} ${level} tutorial OR ${skill} ${level} guide OR learn ${skill} for ${level} (article OR blog)`;
+
+    const response = await axios.get("https://www.googleapis.com/customsearch/v1", {
+        params: {
+            key: GOOGLE_SEARCH_API_KEY,
+            cx: GOOGLE_CX,
+            q: searchQuery,
+            num: 6,
+        },
+    });
+
+    const data = response.data as { items: any[] };
+    const items = data.items || [];
+
+    return items.map((item: any) => ({
+        title: item.title,
+        url: item.link,
+        snippet: item.snippet,
+        source: item.displayLink,
+    }));
+};
+
 
 export const fetchProjects = async (query: string) => {
     const client = new OpenAI({

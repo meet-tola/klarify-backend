@@ -1,16 +1,18 @@
 import express from "express";
 import {
-    generateRoadmapContent,
-    getRoadmaps,
+    generateRoadmapContent, 
     getLearningPathAndRoadmapBySkill,
-    generateRoadmapSections
+    generateRoadmapSections,
+    checkSectionsStatus,
+    getRoadmapBySkill
 } from "../controllers/roadmap.controller";
 
 const router = express.Router();
 
 router.post("/:userId/content", generateRoadmapContent);
 router.post("/:userId/sections", generateRoadmapSections);
-router.get("/:userId/roadmap", getRoadmaps);
+router.post("/:userId/roadmap-by-skill", getRoadmapBySkill);
 router.post("/:userId/learning-path", getLearningPathAndRoadmapBySkill);
+router.post('/:userId/sections-status', checkSectionsStatus);
 
 export default router;

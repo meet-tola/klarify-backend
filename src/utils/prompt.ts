@@ -99,3 +99,124 @@ You are an expert AI course creator specializing in comprehensive skill developm
 4. Ensure valid JSON array output with no comments or markdown
 5. Phase titles should follow the progression guide exactly
 `;
+
+export const getSectionPrompt = (skill: string, level: string, phaseTitle: string, lessonTitle: string, lessonSummary: string) => `
+You are an expert AI course creator. Generate detailed sections for the following lesson in STRICT JSON format.
+
+### LESSON DETAILS:
+- Skill: ${skill}
+- Level: ${level}
+- Phase: ${phaseTitle}
+- Lesson Title: ${lessonTitle}
+- Lesson Summary: ${lessonSummary}
+
+Generate a JSON object with a "sections" array containing three objects.
+{
+  "sections": [
+    {
+      "sectionTitle": "Title (6-8 words)",
+      "sectionType": "Concept Explanation",
+      "keyPoints": {
+        "metadata": ["bullets"],
+        "items": [
+          "15-30 word key takeaway",
+          "15-30 word key takeaway",
+          "15-30 word key takeaway"
+        ]
+      }
+      "content": [
+        {
+          "heading": {
+            "text": "Specific concept (4-6 words)",
+            "metadata": ["bold"]
+          },
+          "description": [
+            {
+              "text": "80-120 word detailed explanation",
+              "metadata": []
+            }
+          ],
+          "examples": [
+            {
+              "type": "case-study",
+              "content": "50-100 word practical example",
+              "metadata": []
+            }
+          ]
+        }
+      ],
+      
+    },
+    {
+      "sectionTitle": "Title (6-8 words)",
+      "sectionType": "Practical Exercise",
+      "keyPoints": {
+        "metadata": ["bullets"],
+        "items": [
+          "15-30 word key takeaway",
+          "15-30 word key takeaway",
+          "15-30 word key takeaway"
+        ]
+      }
+      "content": [
+        {
+          "heading": {
+            "text": "Specific concept (4-6 words)",
+            "metadata": ["bold"]
+          },
+          "description": [
+            {
+              "text": "80-120 word detailed explanation",
+              "metadata": []
+            }
+          ],
+          "examples": [
+            {
+              "type": "code-sample",
+              "content": "50-100 word practical example",
+              "metadata": []
+            }
+          ]
+        }
+      ],
+      
+    },
+    {
+      "sectionTitle": "Title (6-8 words)",
+      "sectionType": "Case Study",
+      "keyPoints": {
+        "metadata": ["bullets"],
+        "items": [
+          "15-30 word key takeaway",
+          "15-30 word key takeaway",
+          "15-30 word key takeaway"
+        ]
+      }
+      "content": [
+        {
+          "heading": {
+            "text": "Specific concept (4-6 words)",
+            "metadata": ["bold"]
+          },
+          "description": [
+            {
+              "text": "80-120 word detailed explanation",
+              "metadata": []
+            }
+          ],
+          "examples": [
+            {
+              "type": "analogy",
+              "content": "50-100 word practical example",
+              "metadata": []
+            }
+          ]
+        }
+      ],
+      
+    }
+  ]
+}
+
+
+`;

@@ -3,9 +3,9 @@ import { BadRequestException } from "../utils/appError";
 import UserModel from "../models/user.model";
 import RoadmapModel from "../models/roadmap.model";
 import { config } from "../config/app.config";
-import { fetchYouTubeVideos, fetchArticles, fetchProjects } from "../services/learningResources.service";
+import { fetchYouTubeVideos, fetchArticles, fetchProjects, fetchArticlesFromGoogle } from "../services/learningResources.service";
 import OpenAI from "openai";
-import { getMainContentPrompt, getPhasesPrompt } from "../utils/prompt";
+import { getMainContentPrompt, getPhasesPrompt, getSectionPrompt } from "../utils/prompt";
 
 const apiKey = config.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
@@ -113,170 +113,46 @@ export const generateRoadmapContentService = async (userId: string) => {
   return roadmap;
 };
 
-export const generateLessonSectionsService = async (userId: string, roadmapId: string, phaseIndex: number = 0): Promise<{ roadmap: any; completed: boolean; nextPhaseIndex?: number } | { completed: boolean; message: string }> => {
+export const generateLessonSectionsService = async (
+  userId: string,
+  roadmapId: string,
+  phaseIndex: number = 0
+): Promise<void> => {
   const user = await UserModel.findById(userId);
   if (!user) throw new BadRequestException("User not found");
 
-  const roadmap = await RoadmapModel.findOne({
-    _id: roadmapId,
-    userId
-  });
+  const roadmap = await RoadmapModel.findOne({ _id: roadmapId, userId });
   if (!roadmap) throw new BadRequestException("Roadmap not found or doesn't belong to user");
 
-  // 2. Check if we've processed all phases
-  if (phaseIndex >= roadmap.phases.length) {
-    return {
-      roadmap,
-      completed: true
-    };
-  }
+  // Out of bounds check
+  if (phaseIndex >= roadmap.phases.length) return;
 
   const phase = roadmap.phases[phaseIndex];
   let hasGeneratedSections = false;
 
-  // 3. Process each lesson in the phase
   for (let lessonIndex = 0; lessonIndex < phase.lessons.length; lessonIndex++) {
     const lesson = phase.lessons[lessonIndex];
 
-    // Skip if lesson already has sections
     if (lesson.sections && lesson.sections.length > 0) continue;
 
-    // Generate sections for this lesson
-    const prompt = `
-You are an expert AI course creator. Generate detailed sections for the following lesson in STRICT JSON format.
-
-### LESSON DETAILS:
-- Skill: ${roadmap.skill}
-- Level: ${roadmap.level}
-- Phase: ${phase.phaseTitle}
-- Lesson Title: ${lesson.lessonTitle}
-- Lesson Summary: ${JSON.stringify(lesson.lessonSummary)}
-
-Generate a JSON object with a "sections" array containing three objects.
-{
-  "sections": [
-    {
-      "sectionTitle": "Title (6-8 words)",
-      "sectionType": "Concept Explanation",
-      "keyPoints": {
-        "metadata": ["bullets"],
-        "items": [
-          "15-30 word key takeaway",
-          "15-30 word key takeaway",
-          "15-30 word key takeaway"
-        ]
-      }
-      "content": [
-        {
-          "heading": {
-            "text": "Specific concept (4-6 words)",
-            "metadata": ["bold"]
-          },
-          "description": [
-            {
-              "text": "80-120 word detailed explanation",
-              "metadata": []
-            }
-          ],
-          "examples": [
-            {
-              "type": "case-study",
-              "content": "50-100 word practical example",
-              "metadata": []
-            }
-          ]
-        }
-      ],
-      
-    },
-    {
-      "sectionTitle": "Title (6-8 words)",
-      "sectionType": "Practical Exercise",
-      "keyPoints": {
-        "metadata": ["bullets"],
-        "items": [
-          "15-30 word key takeaway",
-          "15-30 word key takeaway",
-          "15-30 word key takeaway"
-        ]
-      }
-      "content": [
-        {
-          "heading": {
-            "text": "Specific concept (4-6 words)",
-            "metadata": ["bold"]
-          },
-          "description": [
-            {
-              "text": "80-120 word detailed explanation",
-              "metadata": []
-            }
-          ],
-          "examples": [
-            {
-              "type": "code-sample",
-              "content": "50-100 word practical example",
-              "metadata": []
-            }
-          ]
-        }
-      ],
-      
-    },
-    {
-      "sectionTitle": "Title (6-8 words)",
-      "sectionType": "Case Study",
-      "keyPoints": {
-        "metadata": ["bullets"],
-        "items": [
-          "15-30 word key takeaway",
-          "15-30 word key takeaway",
-          "15-30 word key takeaway"
-        ]
-      }
-      "content": [
-        {
-          "heading": {
-            "text": "Specific concept (4-6 words)",
-            "metadata": ["bold"]
-          },
-          "description": [
-            {
-              "text": "80-120 word detailed explanation",
-              "metadata": []
-            }
-          ],
-          "examples": [
-            {
-              "type": "analogy",
-              "content": "50-100 word practical example",
-              "metadata": []
-            }
-          ]
-        }
-      ],
-      
-    }
-  ]
-}
-
-
-`;
-
     const response = await client.chat.completions.create({
-      messages: [{ role: "user", content: prompt }],
+      messages: [{
+        role: "user",
+        content: getSectionPrompt(
+          roadmap.skill,
+          roadmap.level,
+          phase.phaseTitle,
+          lesson.lessonTitle,
+          JSON.stringify(lesson.lessonSummary)
+        )
+      }],
       model: "gpt-4o",
       temperature: 0.7,
       max_tokens: 10000,
     });
 
     const content = response.choices[0]?.message?.content;
-
     if (!content) throw new Error("No content received from OpenAI");
-
-    // const result = await model.generateContent(prompt);
-    // const content = result.response.text();
-    // if (!content) throw new Error("No content received from Gemini");
 
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error("Failed to extract JSON");
@@ -285,23 +161,15 @@ Generate a JSON object with a "sections" array containing three objects.
       return input.replace(/,\s*}/g, '}').replace(/,\s*]/g, ']');
     }
 
-
-    let rawJSON = jsonMatch?.[0];
-    rawJSON = sanitizeJSON(rawJSON);
+    let rawJSON = sanitizeJSON(jsonMatch[0]);
 
     let sectionsData;
     try {
       sectionsData = JSON.parse(rawJSON);
 
-      // Validate each section within the array
       sectionsData.sections.forEach((section: any) => {
-        if (!section.sectionTitle || !section.sectionType || !Array.isArray(section.content) || typeof section.keyPoints !== 'object' || !Array.isArray(section.keyPoints.items)) {
-          console.error("Malformed JSON (Invalid section structure):", JSON.stringify(section, null, 2));
-          throw new Error('Invalid section structure');
-        }
-        if (section.content.some((c: any) => c.keyPoints)) {
-          console.error("Malformed JSON ('keyPoints' found in content):", JSON.stringify(section.content.find((c: any) => c.keyPoints), null, 2));
-          throw new Error('keyPoints found in content array');
+        if (!section.sectionTitle || !section.sectionType || !Array.isArray(section.content) || !section.keyPoints) {
+          throw new Error("Invalid section structure");
         }
       });
     } catch (err: any) {
@@ -309,42 +177,51 @@ Generate a JSON object with a "sections" array containing three objects.
       throw new Error(`JSON parsing failed: ${err.message}`);
     }
 
-    if (!sectionsData?.sections || !Array.isArray(sectionsData.sections)) {
-      throw new Error("Invalid sections data format");
-    }
-
-    // Validate sections structure
-    sectionsData.sections.forEach((section: any) => {
-      if (!section.sectionTitle || !section.sectionType || !section.content || !section.keyPoints) {
-        throw new Error("Invalid section structure");
-      }
-    });
-
-    // Update the lesson with the generated sections
     lesson.sections = sectionsData.sections;
     hasGeneratedSections = true;
   }
 
-  // 4. Save changes if we generated any sections
   if (hasGeneratedSections) {
     roadmap.markModified(`phases.${phaseIndex}.lessons`);
+
+    // Mark sectionsGenerated = true after phase 0 is fully done
+    const currentPhaseComplete = phase.lessons.every(
+      l => l.sections && l.sections.length > 0
+    );
+    if (phaseIndex === 0 && currentPhaseComplete) {
+      roadmap.sectionsGenerated = true;
+    }
+
     await roadmap.save();
   }
 
-  // 5. Determine if we should continue to next phase
-  const allPhasesCompleted = phaseIndex >= roadmap.phases.length - 1;
-  const currentPhaseFullyProcessed = phase.lessons.every(
-    lesson => lesson.sections && lesson.sections.length > 0
-  );
+  // Automatically proceed to next phase
+  if (phaseIndex + 1 < roadmap.phases.length) {
+    await generateLessonSectionsService(userId, roadmapId, phaseIndex + 1);
+  }
+};
+
+export const checkSectionsGeneratedService = async (roadmapId: string) => {
+  const roadmap = await RoadmapModel.findOne({ _id: roadmapId });
+  if (!roadmap) throw new BadRequestException("Roadmap not found or doesn't belong to user");
 
   return {
-    roadmap,
-    completed: allPhasesCompleted && currentPhaseFullyProcessed,
-    nextPhaseIndex: currentPhaseFullyProcessed ? phaseIndex + 1 : phaseIndex
+    sectionsGenerated: roadmap.sectionsGenerated || false,
+    roadmapTitle: roadmap.title,
+    totalPhases: roadmap.phases.length,
   };
 };
 
-export const fetchRoadmapsService = async (userId: string) => {
-  const roadmaps = await RoadmapModel.find({ userId });
-  return roadmaps;
+
+export const fetchRoadmapBySkillService = async (userId: string, pickedSkill: string) => {
+  const user = await UserModel.findById(userId);
+  if (!user) throw new BadRequestException("User not found");
+
+  const learningPath = user.learningPath.find((path) => path.skill === pickedSkill);
+  if (!learningPath) throw new BadRequestException("Skill not found in learning path");
+
+  const roadmap = await RoadmapModel.findById(learningPath.roadmap);
+  if (!roadmap) throw new BadRequestException("Roadmap not found");
+
+  return roadmap;
 };
