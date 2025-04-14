@@ -106,9 +106,9 @@ You are an expert AI course creator specializing in comprehensive skill developm
 6. Phase 6: Mastery and Real-world Implementation (Complex projects and optimizations)
 
 ### REQUIREMENTS:
-1. Generate exactly 6 phases with 6-8 lessons each
+1. Generate exactly 6 phases with 5-7 lessons each
 2. Phases must completely cover the skill from beginner to advanced level
-3. Each lesson must include lessonTitle, lessonSummary, and empty sections array
+3. Each lesson must include lessonTitle, lessonSummary, resources and empty sections array
 4. Ensure valid JSON array output with no comments or markdown
 5. Phase titles should follow the progression guide exactly
 `;
