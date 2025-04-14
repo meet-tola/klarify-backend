@@ -16,7 +16,6 @@ const model = genAI.getGenerativeModel({
   model: "gemini-1.5-flash",
   generationConfig: {
     maxOutputTokens: 200000,
-    responseMimeType: "application/json",
   },
 });
 
@@ -34,15 +33,20 @@ export const generateRoadmapContentService = async (userId: string) => {
   const level = user.learningPath[0]?.level || "Beginner";
 
   // Generate main content (without phases)
-  const mainContentResponse = await client.chat.completions.create({
-    messages: [{ role: "user", content: getMainContentPrompt(skill, level) }],
-    model: "gpt-4o",
-    temperature: 0.7,
-    max_tokens: 4000,
-  });
+  // const mainContentResponse = await client.chat.completions.create({
+  //   messages: [{ role: "user", content: getMainContentPrompt(skill, level) }],
+  //   model: "gpt-4o",
+  //   temperature: 0.7,
+  //   max_tokens: 4000,
+  // });
 
-  const mainContent = mainContentResponse.choices[0]?.message?.content;
-  if (!mainContent) throw new Error("No main content received from OpenAI");
+  // const mainContent = mainContentResponse.choices[0]?.message?.content;
+  // if (!mainContent) throw new Error("No main content received from OpenAI");
+
+  const mainContentResponse = await model.generateContent(getMainContentPrompt(skill, level));
+  const mainContent = mainContentResponse.response.text();
+  if (!mainContent) throw new Error("No content received from Gemini AI");
+
 
   const mainContentJsonMatch = mainContent.match(/\{[\s\S]*\}/);
   if (!mainContentJsonMatch) throw new Error("Failed to extract JSON from main content");
@@ -51,15 +55,19 @@ export const generateRoadmapContentService = async (userId: string) => {
   if (!roadmapData) throw new Error("Failed to parse main content JSON");
 
   // Generate phases separately
-  const phasesResponse = await client.chat.completions.create({
-    messages: [{ role: "user", content: getPhasesPrompt(skill, level) }],
-    model: "gpt-4o",
-    temperature: 0.7,
-    max_tokens: 10000,
-  });
+  // const phasesResponse = await client.chat.completions.create({
+  //   messages: [{ role: "user", content: getPhasesPrompt(skill, level) }],
+  //   model: "gpt-4o",
+  //   temperature: 0.7,
+  //   max_tokens: 10000,
+  // });
 
-  const phasesContent = phasesResponse.choices[0]?.message?.content;
-  if (!phasesContent) throw new Error("No phases content received from OpenAI");
+  // const phasesContent = phasesResponse.choices[0]?.message?.content;
+  // if (!phasesContent) throw new Error("No phases content received from OpenAI");
+
+  const phasesResponse = await model.generateContent(getPhasesPrompt(skill, level));
+  const phasesContent = phasesResponse.response.text();
+  if (!phasesContent) throw new Error("No content received from Gemini AI");
 
   const phasesJsonMatch = phasesContent.match(/\[[\s\S]*\]/);
   if (!phasesJsonMatch) throw new Error("Failed to extract JSON from phases content");
@@ -172,24 +180,34 @@ export const generateLessonSectionsService = async (
 
     if (lesson.sections && lesson.sections.length > 0) continue;
 
-    const response = await client.chat.completions.create({
-      messages: [{
-        role: "user",
-        content: getSectionPrompt(
-          roadmap.skill,
-          roadmap.level,
-          phase.phaseTitle,
-          lesson.lessonTitle,
-          JSON.stringify(lesson.lessonSummary)
-        )
-      }],
-      model: "gpt-4o",
-      temperature: 0.7,
-      max_tokens: 10000,
-    });
+    // const response = await client.chat.completions.create({
+    //   messages: [{
+    //     role: "user",
+    //     content: getSectionPrompt(
+    //       roadmap.skill,
+    //       roadmap.level,
+    //       phase.phaseTitle,
+    //       lesson.lessonTitle,
+    //       JSON.stringify(lesson.lessonSummary)
+    //     )
+    //   }],
+    //   model: "gpt-4o",
+    //   temperature: 0.7,
+    //   max_tokens: 10000,
+    // });
 
-    const content = response.choices[0]?.message?.content;
-    if (!content) throw new Error("No content received from OpenAI");
+    // const content = response.choices[0]?.message?.content;
+    // if (!content) throw new Error("No content received from OpenAI");
+
+    const response = await model.generateContent(getSectionPrompt(
+      roadmap.skill,
+      roadmap.level,
+      phase.phaseTitle,
+      lesson.lessonTitle,
+      JSON.stringify(lesson.lessonSummary)
+    ));
+    const content = response.response.text();
+    if (!content) throw new Error("No content received from Gemini AI");
 
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error("Failed to extract JSON");
