@@ -4,7 +4,7 @@ Prioritize creating a complete, valid JSON structure even if it means slightly d
 
 ### COURSE STRUCTURE:
 {
-  "title": "Complete ${skill} Mastery: From ${level} to Proficient",
+  "title": "Master ${skill}: From ${level} to Pro",
   "skill": "${skill}",
   "level": "${level}",
   "tips": [
@@ -146,7 +146,7 @@ Generate a JSON object with a "sections" array containing three objects.
           "description": [
             {
               "text": "80-120 word detailed explanation",
-              "metadata": []
+              "metadata": ["bold", "highlight"]
             }
           ],
           "examples": [
@@ -179,16 +179,21 @@ Generate a JSON object with a "sections" array containing three objects.
           },
           "description": [
             {
-              "text": "80-120 word detailed explanation",
+              "text": "80-100 word detailed explanation",
               "metadata": []
             }
           ],
           "examples": [
             {
               "type": "code-sample",
-              "content": "50-100 word practical example",
-              "metadata": []
-            }
+              "content": "50–80 word practical example",
+              "metadata": ["code"]
+            },
+            {
+              "type": "thought-experiment",
+              "content": "Imagine if React didn't have hooks. How would you manage state in functional components? What patterns would emerge to work around this limitation?",
+              "metadata": ["question"]
+            }, // pick one of the two examples
           ]
         }
       ],
@@ -213,15 +218,15 @@ Generate a JSON object with a "sections" array containing three objects.
           },
           "description": [
             {
-              "text": "80-120 word detailed explanation",
+              "text": "80-100 word detailed explanation",
               "metadata": []
             }
           ],
           "examples": [
             {
               "type": "analogy",
-              "content": "50-100 word practical example",
-              "metadata": []
+              "content": "50–100 word practical example",
+              "metadata": ["italic"]
             }
           ]
         }
@@ -231,5 +236,18 @@ Generate a JSON object with a "sections" array containing three objects.
   ]
 }
 
+#### Available metadata values (used in \`metadata\` arrays):
+- **bold** – Emphasize important text
+- **italic** – Highlight supporting or contrasting ideas
+- **code** – Denote code, syntax, or commands
+- **quote** – For quoted insights or cited material
+- **highlight** – Draw special attention to concepts
+- **link:**[url] – Include reference URLs
+
+#### Available example types:
+- **case-study** – Real-world application or scenario
+- **code-sample** – Short, illustrative code snippet or pattern
+- **analogy** – Simple metaphor to explain a complex topic
+- **thought-experiment** – Hypothetical situation to explore ideas
 
 `;
