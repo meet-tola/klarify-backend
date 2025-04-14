@@ -3,7 +3,7 @@ import { BadRequestException } from "../utils/appError";
 import UserModel from "../models/user.model";
 import RoadmapModel from "../models/roadmap.model";
 import { config } from "../config/app.config";
-import { fetchYouTubeVideos, fetchArticles, fetchProjects, fetchArticlesFromGoogle } from "../services/learningResources.service";
+import { fetchYouTubeVideos, fetchArticles, fetchProjects, fetchArticlesFromGoogle, fetchYouTubeVideosForLessons, fetchArticlesFromGoogleForLessons } from "../services/learningResources.service";
 import OpenAI from "openai";
 import { getMainContentPrompt, getPhasesPrompt, getSectionPrompt } from "../utils/prompt";
 
@@ -82,14 +82,14 @@ export const generateRoadmapContentService = async (userId: string) => {
     for (const lesson of phase.lessons) {
       // Fetch YouTube videos for the lesson
       if (lesson.resources?.youtubeVideos) {
-        lesson.resources.youtubeVideos = await fetchYouTubeVideos(lesson.resources.youtubeVideos);
+        lesson.resources.youtubeVideos = await fetchYouTubeVideosForLessons(lesson.resources.youtubeVideos);
       } else {
         lesson.resources.youtubeVideos = [];
       }
 
       // Fetch articles for the lesson
       if (lesson.resources?.articles) {
-        lesson.resources.articles = await fetchArticlesFromGoogle(lesson.resources.articles);
+        lesson.resources.articles = await fetchArticlesFromGoogleForLessons(lesson.resources.articles);
       } else {
         lesson.resources.articles = [];
       }

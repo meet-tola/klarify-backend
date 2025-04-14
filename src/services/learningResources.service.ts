@@ -26,6 +26,24 @@ export const fetchYouTubeVideos = async (query: string) => {
     }));
 };
 
+export const fetchYouTubeVideosForLessons = async (query: string) => {
+    const response = await axios.get("https://www.googleapis.com/youtube/v3/search", {
+        params: {
+            q: query,
+            key: YOUTUBE_API_KEY,
+            part: "snippet",
+            maxResults: 3,
+            type: "video",
+        },
+    });
+
+    return (response.data as { items: any[] }).items.map((item: any) => ({
+        title: item.snippet.title,
+        url: `https://www.youtube.com/watch?v=${item.id.videoId}`,
+        thumbnail: item.snippet.thumbnails.medium.url,
+    }));
+};
+
 export const fetchArticles = async (query: string) => {
     const client = new OpenAI({
         baseURL: "https://models.inference.ai.azure.com",
@@ -82,6 +100,29 @@ export const fetchArticlesFromGoogle = async (query: string) => {
             cx: GOOGLE_CX,
             q: searchQuery,
             num: 6,
+        },
+    });
+
+    const data = response.data as { items: any[] };
+    const items = data.items || [];
+
+    return items.map((item: any) => ({
+        title: item.title,
+        url: item.link,
+        // snippet: item.snippet,
+        author: item.displayLink,
+    }));
+};
+
+export const fetchArticlesFromGoogleForLessons = async (query: string) => {
+    const searchQuery = `${query} (article OR blog OR guide OR tutorial)`;
+
+    const response = await axios.get("https://www.googleapis.com/customsearch/v1", {
+        params: {
+            key: GOOGLE_SEARCH_API_KEY,
+            cx: GOOGLE_CX,
+            q: searchQuery,
+            num: 4,
         },
     });
 
