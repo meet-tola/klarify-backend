@@ -117,7 +117,7 @@ export const sendWelcomeEmail = async (email: string, name: string): Promise<boo
       title: "Welcome to Klarify!",
       greeting: `Hello ${name},`,
       content: "Thank you for joining Klarify. We're excited to help you achieve your goals!",
-      buttonUrl: `${config.FRONTEND_URL}/my-learning`,
+      buttonUrl: `${config.FRONTEND_URL}/roadmap`,
       buttonText: "Get Started",
       serverDomain: config.SERVER_DOMAIN,
       year: new Date().getFullYear(),
